@@ -1,0 +1,12 @@
+{
+    "name": "owlmasters-frontend",
+    "version": "1.0.0",
+    "scripts": {
+      "build": "echo 'No build step needed'",
+      "start": "serve -s ."
+    },
+    "dependencies": {
+      "serve": "^14.0.1"
+    }
+  }
+  
