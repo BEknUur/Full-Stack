@@ -1,0 +1,7 @@
+pwd
+
+ls
+
+mkdir Documents
+
+root@beknur-server:~/Documents# mkdir cli_practice

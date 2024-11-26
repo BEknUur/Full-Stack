@@ -1,0 +1,69 @@
+mkdir adventure_journey
+cd
+cd adventure_journey/
+code journal.txt
+touch journal.txt
+mkdir maps
+mkdir inventory
+cd maps/
+touch map1.txt
+cd ..
+in
+in
+cd inventory/
+ls
+cd ..
+cd maps/
+cp adventure_journey/maps/map1.txt adventure_journey/inventory/forest_map.txt
+cp ~/Documents/adventure_journey/maps/map1.txt ~/Documents/adventure_journey/inventory/forest_map.txt
+ls
+cd ..
+cd inventory/
+ls
+touch supplies_list.txt
+cd ..
+cd maps/
+touch map2.txt
+mv map
+mv map2.txt mountain_map.txt
+ls
+cp /home/username/Documents/adventure_journey/maps/mountain_map.txt /home/username/Documents/adventure_journey/inventory/backup_mountain_map.txt
+ls
+cd ..
+cd inventory/
+ls
+cp mountain_map.txt ../inventory/backup_mountain_map.txt
+ls
+ls
+cp ~/Documents/adventure_journey/maps/mountain_map.txt ~/Documents/adventure_journey/inventory/backup_mountain_map.txt
+ls
+cd ..
+rmdir adventure_journey/
+mkdir logs
+cd
+cd logs/
+touch log_day1.txt log_day2.txt
+ls
+mv log_day1.txt ../inventory/
+cd ..
+cd inventory/
+ls
+rm backup_mountain_map.txt
+ls
+cd ..
+cd logs/
+mv log_day2.txt log_day2_mountain.txt
+ls
+cd ..
+cd maps/
+mkdir backup_maps
+ls
+cd ..
+cd inventory/
+ls
+rm supplies_list.txt
+cd ..
+rmdir adventure_journey/
+ls
+rm -rf adventure_journey/
+ls
