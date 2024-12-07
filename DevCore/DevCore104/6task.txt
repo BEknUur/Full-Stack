@@ -1,0 +1,12 @@
+ls
+cd cli_practice/
+ls
+cp -r maps/ backup_maps/
+mkdir folder
+ls
+cp -r folder/ backup_maps/
+ls
+touch journal.txt
+mv journal.txt meetingjournal.txt
+ls
+rm --help

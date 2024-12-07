@@ -1,0 +1,3 @@
+Port 22 on 127.0.0.1 is closed
+Port 80 on 127.0.0.1 is closed
+Port 3306 on 127.0.0.1 is closed

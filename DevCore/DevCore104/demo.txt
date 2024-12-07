@@ -1,0 +1,80 @@
+# Перейти в домашнюю директорию
+cd ~
+
+# Создать основную папку проекта
+mkdir my_project
+
+
+
+# Перейти в папку проекта
+cd my_project
+
+# Создать поддиректории
+mkdir docs src data logs
+
+
+
+# Создать файл readme.txt и записать описание проекта
+echo "Это мой проект для DevCore 104. Здесь я учусь работать с командной строкой." > docs/readme.txt
+
+
+# Создать файл script.sh и добавить команды
+echo "#!/bin/bash" > src/script.sh
+echo "echo 'Привет! Это мой простой скрипт.'" >> src/script.sh
+
+# Сделать файл исполняемым
+chmod +x src/script.sh
+
+
+# Создать файл info.txt и добавить несколько строк текста
+echo "Строка 1: информация" > data/info.txt
+echo "Строка 2: данные" >> data/info.txt
+echo "Строка 3: анализ" >> data/info.txt
+
+
+# Создать пустой файл output.log
+touch logs/output.log
+
+
+# Отобразить содержимое readme.txt
+cat docs/readme.txt
+
+# Отобразить содержимое info.txt
+cat data/info.txt
+
+# Найти строки, содержащие слово "данные" в info.txt
+grep "данные" data/info.txt
+
+
+
+# Запустить скрипт script.sh и вывести результат на экран
+./src/script.sh
+
+# Перенаправить вывод скрипта в файл output.log
+./src/script.sh > logs/output.log
+
+# Проверить содержимое output.log
+cat logs/output.log
+
+
+
+# Создать файл commands_history.txt и записать использованные команды
+echo "Команды, использованные в проекте:" > commands_history.txt
+echo "mkdir my_project" >> commands_history.txt
+echo "cd my_project" >> commands_history.txt
+echo "mkdir docs src data logs" >> commands_history.txt
+# Продолжайте добавлять остальные команды# Создать файл commands_history.txt и записать использованные команды
+echo "Команды, использованные в проекте:" > commands_history.txt
+echo "mkdir my_project" >> commands_history.txt
+echo "cd my_project" >> commands_history.txt
+echo "mkdir docs src data logs" >> commands_history.txt
+# Продолжайте добавлять остальные команды
+
+
+
+# Найти все файлы с расширением .txt в проекте
+find . -name "*.txt"
+
+# Вывести структуру проекта
+ls -R
+

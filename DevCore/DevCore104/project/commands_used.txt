@@ -1,0 +1,68 @@
+# 1. Создание файла log.txt
+touch log.txt
+
+# 2. Добавление первой строки текста в log.txt
+echo "Line1" > log.txt
+
+# 3. Добавление второй строки текста в log.txt
+echo "Line2" >> log.txt
+
+# 4. Просмотр содержимого log.txt
+cat log.txt
+
+# 5. Добавление третьей строки текста в log.txt
+echo "Line3" >> log.txt
+
+# 6. Добавление четвёртой строки текста в log.txt
+echo "Line4" >> log.txt
+
+# 7. Добавление пятой строки текста в log.txt
+echo "Line5" >> log.txt
+
+# 8. Добавление шестой строки текста в log.txt
+echo "Line6" >> log.txt
+
+# 9. Добавление седьмой строки текста в log.txt
+echo "Line7" >> log.txt
+
+# 10. Добавление восьмой строки текста в log.txt
+echo "Line8" >> log.txt
+
+# 11. Добавление девятой строки текста в log.txt
+echo "Line9" >> log.txt
+
+# 12. Добавление десятой строки текста в log.txt
+echo "Line10" >> log.txt
+
+# 13. Просмотр содержимого log.txt
+cat log.txt
+
+# 14. Поиск строк, содержащих слово "error" в log.txt
+grep "error" log.txt
+
+# 15. Подсчёт количества строк в log.txt
+wc -l log.txt
+
+# 16. Попытка поиска файлов с расширением .txt с неверным синтаксисом
+find type f -name "*.txt"
+
+# 17. Поиск всех файлов с расширением .txt в домашней директории
+find ~ -type f -name "*.txt"
+
+# 18. Создание файла txt_files_list.txt
+touch txt_files_list.txt
+
+# 19. Просмотр содержимого текущей директории
+ls
+
+# 20. Сохранение результата поиска файлов .txt в txt_files_list.txt
+find ~ -type f -name "*.txt" > ~/txt_files_list.txt
+
+# 21. Просмотр содержимого txt_files_list.txt
+cat txt_files_list.txt
+
+# 22. Попытка сохранения результата поиска файлов .txt в /txt_files_list.txt (неверный путь)
+find ~ -type f -name "*.txt" > /txt_files_list.txt
+
+# 23. Просмотр содержимого txt_files_list.txt
+cat txt_files_list.txt
