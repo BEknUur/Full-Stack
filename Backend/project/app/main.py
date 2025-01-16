@@ -4,7 +4,7 @@ from database import Base,engine,get_db
 from models import User
 from schemas import UserCreate, UserOut
 from utils import hash_password ,verify_password
-
+ 
 Base.metadata.create_all(bind=engine)
 
 app=FastAPI()
