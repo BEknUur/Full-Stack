@@ -1,6 +1,8 @@
+// Home.tsx
 import { useState, useEffect } from "react";
 import axios from "axios";
 import WeatherCard from "../components/WeatherCard";
+import { FaSpinner } from "react-icons/fa";
 
 interface WeatherData {
   city: string;
@@ -41,24 +43,49 @@ const Home: React.FC = () => {
     fetchWeather(city);
   }, [city]);
 
+  const getBackgroundImage = (condition: string) => {
+    switch (condition) {
+      case "clear sky":
+        return "url('https://source.unsplash.com/1600x900/?sunny')";
+      case "few clouds":
+      case "scattered clouds":
+      case "broken clouds":
+        return "url('https://source.unsplash.com/1600x900/?cloudy')";
+      case "shower rain":
+      case "rain":
+        return "url('https://source.unsplash.com/1600x900/?rain')";
+      case "thunderstorm":
+        return "url('https://source.unsplash.com/1600x900/?thunderstorm')";
+      case "snow":
+        return "url('https://source.unsplash.com/1600x900/?snow')";
+      default:
+        return "url('https://source.unsplash.com/1600x900/?weather')";
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Weather App</h1>
+    <div
+      className="min-h-screen flex flex-col items-center justify-center p-4 bg-cover bg-center"
+      style={{
+        backgroundImage: weather ? getBackgroundImage(weather.condition) : "url('https://source.unsplash.com/1600x900/?weather')",
+      }}
+    >
+      <h1 className="text-3xl font-bold text-white mb-6">Weather App</h1>
       <input
         type="text"
         value={city}
         onChange={(e) => setCity(e.target.value)}
         placeholder="Enter city"
-        className="mb-4 p-2 border border-gray-300 rounded-lg w-full max-w-sm"
+        className="mb-4 p-2 border border-gray-300 rounded-lg w-full max-w-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       <button
         onClick={() => fetchWeather(city)}
-        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+        className="bg-white text-blue-500 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors duration-300"
       >
         Get Weather
       </button>
-      {loading && <p className="mt-4 text-gray-600">Loading...</p>}
-      {error && <p className="mt-4 text-red-500">{error}</p>}
+      {loading && <FaSpinner className="mt-4 text-white animate-spin" size={24} />}
+      {error && <p className="mt-4 text-red-200">{error}</p>}
       {weather && (
         <WeatherCard
           city={weather.city}

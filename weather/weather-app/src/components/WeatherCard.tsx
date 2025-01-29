@@ -1,3 +1,4 @@
+// WeatherCard.tsx
 import { Card, CardContent } from "./ui/card";
 
 interface WeatherCardProps {
@@ -9,7 +10,7 @@ interface WeatherCardProps {
 
 const WeatherCard: React.FC<WeatherCardProps> = ({ city, temperature, condition, icon }) => {
   return (
-    <Card className="w-full max-w-sm mx-auto bg-white shadow-lg rounded-lg">
+    <Card className="w-full max-w-sm mx-auto bg-white shadow-lg rounded-lg transform transition-all duration-500 hover:scale-105">
       <CardContent>
         <h2 className="text-2xl font-bold text-gray-800 text-center">{city}</h2>
         <p className="text-4xl font-semibold text-center text-blue-500 my-2">
