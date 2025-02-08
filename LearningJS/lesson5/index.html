@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lesson-5</title>
+    <style>
+
+    </style>
+</head>
+<body>
+    <button onClick="console.log(`Cart quantity: ${cartQuantity}`)">Show Quantity</button>
+    <button onClick="cartQuantity++;
+    console.log(`Zeket: ${cartQuantity}`)">Add to Cart</button>
+
+    <button onclick="cartQuantity+=2
+    console.log(`Cart quantity:${cartQuantity}`)">Add 2+</button>
+    <button onclick="cartQuantity+=3
+    console.log(`Cart quantity:${cartQuantity}`)">Add 3+</button>
+    <button onclick="cartQuantity=0 
+    console.log(`Cart was reset:${cartQuantity}`)">Reset Cart</button>
+
+    <script>
+        let cartQuantity=0;
+
+    </script>
+</body>
+</html>
