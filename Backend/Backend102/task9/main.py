@@ -4,7 +4,7 @@ from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from typing import Optional
-from _uuid import uuid4
+from uuid import uuid4
 
 app = FastAPI()
 
@@ -16,10 +16,8 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 10
 REFRESH_TOKEN_EXPIRE_DAYS = 7 
 
 users = {}
-used_refesh_tockens={}
-active_refresh_tockens={}
-
-
+active_refresh_tokens = {}
+used_refresh_tokens = {}
 
 class UserRegister(BaseModel):
     name: str
@@ -40,7 +38,6 @@ class Token(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
-
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -74,66 +71,52 @@ def verify_token(token: str):
 def register(user: UserRegister):
     if len(user.password) < 6:
         raise HTTPException(status_code=400, detail="Пароль должен содержать минимум 6 символов")
-
     if user.email in users:
         raise HTTPException(status_code=400, detail="Пользователь с таким email уже зарегистрирован")
-
     if user.role not in ["admin", "user"]:
         raise HTTPException(status_code=400, detail="Роль должна быть 'admin' или 'user'")
-    
-    user_id=str(uuid4)
-
+    user_id = str(uuid4())
     hashed_password = hash_password(user.password)
     users[user.email] = {
         "name": user.name,
         "email": user.email,
         "password": hashed_password,
         "role": user.role,
-        "user_id": user_id  
+        "user_id": user_id
     }
     return {"message": "Регистрация успешна", "user_id": user_id}
+
 @app.post("/auth/login", response_model=Token)
 def login(user: UserLogin):
     if user.email not in users:
         raise HTTPException(status_code=400, detail="Неверный email или пароль")
-
     stored_user = users[user.email]
     if not verify_password(user.password, stored_user["password"]):
         raise HTTPException(status_code=400, detail="Неверный email или пароль")
-
     access_token = create_access_token(data={"sub": user.email, "role": stored_user["role"]})
     refresh_token = create_refresh_token(data={"sub": user.email, "role": stored_user["role"]})
-
-    if user.email in active_refresh_tockens:
-        old_refresh_token = active_refresh_tockens[user.email]
-        active_refresh_tockens[old_refresh_token] = datetime.utcnow()  
-        print(f"Old refresh token {old_refresh_token} is now invalid.")
-
-    active_refresh_tockens[user.email] = refresh_token
-
+    if user.email in active_refresh_tokens:
+        old_token = active_refresh_tokens[user.email]
+        used_refresh_tokens[old_token] = datetime.utcnow()
+    active_refresh_tokens[user.email] = refresh_token
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 @app.post("/auth/refresh", response_model=Token)
-def refresh_token(refresh_token: str):
-    if refresh_token in used_refesh_tockens:
-        raise HTTPException(status_code=401,detail="Этот refresh token уже использован")
+def refresh_token_endpoint(refresh_token: str):
+    if refresh_token in used_refresh_tokens:
+        raise HTTPException(status_code=401, detail="Refresh token is not active")
     try:
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
         if email is None or email not in users:
             raise HTTPException(status_code=401, detail="Invalid token or user")
-
         if datetime.utcnow() > datetime.utcfromtimestamp(payload["exp"]):
             raise HTTPException(status_code=401, detail="Refresh token has expired")
-        
-        used_refesh_tockens[refresh_token] = datetime.utcnow()
-
+        used_refresh_tokens[refresh_token] = datetime.utcnow()
         new_access_token = create_access_token(data={"sub": email, "role": users[email]["role"]})
         new_refresh_token = create_refresh_token(data={"sub": email, "role": users[email]["role"]})
-
-        active_refresh_tockens[email] = new_refresh_token
-        return {"access_token": new_access_token, "refresh_token": refresh_token, "token_type": "bearer"}
-
+        active_refresh_tokens[email] = new_refresh_token
+        return {"access_token": new_access_token, "refresh_token": new_refresh_token, "token_type": "bearer"}
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
 
@@ -158,3 +141,10 @@ def user_check(token: str = Depends(verify_token)):
 @app.get("/me")
 def me(token: str = Depends(verify_token)):
     return {"name": token["name"], "email": token["email"], "role": token["role"]}
+
+@app.post("/auth/logout")
+def logout_user(user: dict = Depends(verify_token)):
+    email = user["email"]
+    if email in active_refresh_tokens:
+        del active_refresh_tokens[email]
+    return {"message": "Successfully logged out"}
