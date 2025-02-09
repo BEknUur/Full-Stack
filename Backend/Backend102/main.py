@@ -5,11 +5,14 @@ from pydantic.types import constr
 
 app=FastAPI()
 
-@app.post("/health/")
-def health_check():
-    return {"check":"ok"}
 
-@app.post("/login/")
+@app.get("/health")
+async def health_check():
+   return {"check":"ok"}
+
+
+
+@app.get("/login/")
 async def login(username:str=Form(),password:str=Form()):
     return{"username":username,"message":"Login successful"}
 
