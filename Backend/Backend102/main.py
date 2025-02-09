@@ -1,17 +1,109 @@
-from fastapi import FastAPI,HTTPException,Form,File,UploadFile
+from fastapi import FastAPI,HTTPException,Form,File,UploadFile,status
 from pydantic import BaseModel, Field, field_validator, EmailStr, conint ,constr
 from pydantic.types import constr
+users = [
+    {"id": 1, "name": "Adilet", "email": "adilet@example.com", "role": "admin"},
+    {"id": 2, "name": "Anuar", "email": "anuar@example.com", "role": "user"}
+]
 
 
 app=FastAPI()
+class User(BaseModel):
+   id:int
+   name:str
+   email:EmailStr
+   role:str
 
 
 @app.get("/health")
 async def health_check():
    return {"check":"ok"}
 
+@app.post("/users",response_model=User,status_code=status.HTTP_201_CREATED)
+async def create_user(user: User):
+    for existing_user in users:
+       if existing_user["email"]==user.email:
+          raise HTTPException(
+          status_code=status.HTTP_400_BAD_REQUEST,detail=f"Email {user.email} is already exist"
+         )
+      
+
+    new_user= {
+   "id":user.id,
+   "name":user.name,
+   "email":user.email,
+   "role":user.role
+       
+    }
+    users.append(new_user)
+    return new_user
 
 
+@app.get("/users",response_model=list[User])
+async def get_users():
+   return users
+
+
+   
+@app.get("/users/{user_id}", response_model=User)
+async def get_id(user_id: int):
+    for user in users:
+        if user["id"] == user_id:
+            return user
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="The user not found"
+    )
+
+   
+
+@app.put("/users/{user_id}", response_model=User)
+async def update_user(user_id: int, updated_data: User):
+    for idx, existing_user in enumerate(users):
+        if existing_user["id"] == user_id:
+            if updated_data.email != existing_user["email"]:
+                for other_user in users:
+                    if other_user["email"] == updated_data.email:
+                        raise HTTPException(
+                            status_code=status.HTTP_400_BAD_REQUEST,
+                            detail=f"Email '{updated_data.email}' is already in use."
+                        )
+       
+            users[idx] = {
+                "id": user_id, 
+                "name": updated_data.name,
+                "email": updated_data.email,
+                "role": updated_data.role
+            }
+            return users[idx]
+
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="User not found"
+    )
+
+
+
+
+@app.delete("/users/{user_id}",status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(user_id:int): 
+    for idx, user in enumerate(users):
+        if user["id"]==user_id:
+            del users[idx]
+            return
+    raise HTTPException(
+         status_code=status.HTTP_404_NOT_FOUND, detail="User is not found"
+      )
+
+   
+
+
+
+
+
+'''
 @app.get("/login/")
 async def login(username:str=Form(),password:str=Form()):
     return{"username":username,"message":"Login successful"}
@@ -36,7 +128,7 @@ async def uploadFiles(files:List[UploadFile]=File()):
 
 
 
-'''
+
 
 @app.get("/")
 def name():
@@ -125,4 +217,6 @@ async def register(user: User):
             status_code=400,
             detail=str(e)
         )
-        '''
+    
+
+'''
