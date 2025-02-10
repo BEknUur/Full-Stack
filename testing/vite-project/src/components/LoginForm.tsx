@@ -2,27 +2,29 @@ import React, { useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Mail, Lock } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 const LoginForm: React.FC = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    remember: false,
   });
-
   const [errors, setErrors] = useState({
     email: "",
     password: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const navigate = useNavigate(); // Хук для перенаправления
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
     setErrors((prev) => ({
       ...prev,
@@ -53,18 +55,18 @@ const LoginForm: React.FC = () => {
     e.preventDefault();
 
     if (validateForm()) {
-      alert("Login Successful!");
-      console.log(formData); // Для отладки
-
-      // Перенаправление на страницу профиля
-      navigate("/profile-page");
+      setIsLoading(true);
+      // Эмулируем API вызов
+      setTimeout(() => {
+        console.log("Login Successful:", formData);
+        setIsLoading(false);
+        navigate("/profile-page");
+      }, 1500);
     }
   };
 
   return (
-    <div
-      className="h-screen w-screen flex justify-center items-center bg-gradient-to-br from-blue-900 to-black"
-    >
+    <div className="h-screen w-screen flex justify-center items-center bg-gradient-to-br from-blue-900 to-black">
       <Card className="w-full max-w-md p-8 shadow-2xl border border-gray-700 bg-gray-800 rounded-2xl transition-transform hover:scale-105 duration-300">
         <CardHeader>
           <CardTitle className="text-center text-3xl font-extrabold text-white mb-6 tracking-wider">
@@ -73,7 +75,7 @@ const LoginForm: React.FC = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email */}
+            {/* Email Field */}
             <div className="relative">
               <label
                 htmlFor="email"
@@ -99,7 +101,7 @@ const LoginForm: React.FC = () => {
               )}
             </div>
 
-            {/* Password */}
+           
             <div className="relative">
               <label
                 htmlFor="password"
@@ -111,7 +113,7 @@ const LoginForm: React.FC = () => {
               <Input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Enter your password"
@@ -120,19 +122,57 @@ const LoginForm: React.FC = () => {
                 } text-white placeholder-gray-500 p-3 pl-10 shadow-inner focus:ring-4 focus:ring-blue-500 focus:outline-none transition-all`}
                 required
               />
+              <div
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-blue-400"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </div>
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">{errors.password}</p>
               )}
             </div>
 
-            {/* Submit Button */}
+            {/* Remember Me */}
+            <div className="flex items-center">
+              <input
+                id="remember"
+                name="remember"
+                type="checkbox"
+                checked={formData.remember}
+                onChange={handleChange}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded"
+              />
+              <label htmlFor="remember" className="ml-2 block text-sm text-gray-400">
+                Remember me
+              </label>
+            </div>
+
             <Button
               type="submit"
               className="w-full py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white font-bold rounded-lg hover:from-green-500 hover:to-blue-500 hover:scale-105 focus:ring-4 focus:ring-blue-500 transition-transform"
+              disabled={isLoading}
             >
-              Login
+              {isLoading ? "Logging in..." : "Login"}
             </Button>
           </form>
+
+          {/* Social Login Section */}
+          <div className="mt-6">
+            <p className="text-center text-sm text-gray-400 mb-4">
+              Or login with
+            </p>
+            <div className="flex justify-center space-x-4">
+              <Button className="flex items-center bg-red-600 hover:bg-red-700">
+                {/* Здесь можно вставить иконку Google */}
+                Google
+              </Button>
+              <Button className="flex items-center bg-blue-600 hover:bg-blue-700">
+                {/* Здесь можно вставить иконку Facebook */}
+                Facebook
+              </Button>
+            </div>
+          </div>
 
           <p className="text-center text-sm text-gray-400 mt-4">
             Don't have an account?{" "}

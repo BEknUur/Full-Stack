@@ -28,7 +28,7 @@ const RegisterForm: React.FC = () => {
     }));
     setErrors((prev) => ({
       ...prev,
-      [name]: "", // Очистка ошибок при изменении значения
+      [name]: "", 
     }));
   };
 
@@ -66,7 +66,7 @@ const RegisterForm: React.FC = () => {
 
     if (validateForm()) {
       alert("Registration Successful!");
-      console.log(formData); // Для отладки
+      console.log(formData);
     }
   };
 
@@ -107,7 +107,7 @@ const RegisterForm: React.FC = () => {
               )}
             </div>
 
-            {/* Email */}
+          
             <div className="relative">
               <label
                 htmlFor="email"
@@ -133,7 +133,7 @@ const RegisterForm: React.FC = () => {
               )}
             </div>
 
-            {/* Password */}
+            
             <div className="relative">
               <label
                 htmlFor="password"
@@ -159,7 +159,7 @@ const RegisterForm: React.FC = () => {
               )}
             </div>
 
-            {/* Confirm Password */}
+            
             <div className="relative">
               <label
                 htmlFor="confirmPassword"
@@ -187,7 +187,7 @@ const RegisterForm: React.FC = () => {
               )}
             </div>
 
-            {/* Submit Button */}
+            
             <Button
               type="submit"
               className="w-full py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white font-bold rounded-lg hover:from-green-500 hover:to-blue-500 hover:scale-105 focus:ring-4 focus:ring-blue-500 transition-transform"
