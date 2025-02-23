@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Plus, Minus } from "lucide-react";
 
 const FAQSection: React.FC = () => {
-  // Вопросы и ответы можно хранить в массиве объектов:
+  
   const faqs = [
     {
       question: "What documents are required?",
@@ -26,10 +26,7 @@ const FAQSection: React.FC = () => {
     },
   ];
 
-  // Состояние, чтобы контролировать, какой вопрос сейчас «открыт»
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-
-  // Функция переключения (если уже открыт, закрываем; иначе открываем)
   const toggleFAQ = (index: number) => {
     if (expandedIndex === index) {
       setExpandedIndex(null);
@@ -52,7 +49,7 @@ const FAQSection: React.FC = () => {
               className="bg-gray-900 p-4 rounded-lg cursor-pointer"
               onClick={() => toggleFAQ(i)}
             >
-              {/* Заголовок вопроса + иконка +/- */}
+             
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-lg text-white">
                   {faq.question}
@@ -64,7 +61,7 @@ const FAQSection: React.FC = () => {
                 )}
               </div>
 
-              {/* Ответ показываем только если вопрос «открыт» */}
+              
               {isOpen && (
                 <p className="text-gray-300 mt-2 transition-all duration-300">
                   {faq.answer}

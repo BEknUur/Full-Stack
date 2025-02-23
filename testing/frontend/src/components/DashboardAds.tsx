@@ -7,7 +7,7 @@ interface CarAd {
   price: string;
   location: string;
   rating: number;
-  imageUrl?: string; // опциональное поле для изображения авто
+  imageUrl?: string;
 }
 
 const DashboardAds: React.FC = () => {
@@ -17,13 +17,13 @@ const DashboardAds: React.FC = () => {
     { id: 2, name: "Hyundai Sonata", price: "80$/day", location: "Astana", rating: 4.0 },
   ]);
 
-  // Функция редактирования (пример: можно открыть модальное окно или перенаправить на страницу редактирования)
+
   const handleEdit = (id: number) => {
     console.log("Edit ad with id:", id);
-    // Реализуйте навигацию или модальное окно для редактирования объявления
+    
   };
 
-  // Функция удаления с подтверждением
+ 
   const handleDelete = (id: number) => {
     if (window.confirm("Are you sure you want to delete this ad?")) {
       setUploadedCars((prevCars) => prevCars.filter((car) => car.id !== id));

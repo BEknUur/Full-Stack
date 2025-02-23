@@ -306,7 +306,7 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* PARTNERS (пример) */}
+     
       <section className="py-16 bg-gray-800 text-center">
         <h2 className="text-3xl font-bold mb-8">Trusted by Our Partners</h2>
         <div className="flex flex-wrap justify-center items-center gap-8 max-w-10xl mx-auto">
@@ -326,7 +326,7 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* TESTIMONIALS */}
+      
       <section className="py-16 bg-gray-900 text-center">
         <motion.h2
           className="text-3xl font-bold mb-8"
@@ -411,7 +411,7 @@ const HomePage: React.FC = () => {
             <span className="hidden sm:inline">Instagram</span>
           </a>
 
-          {/* Telegram */}
+         
           <a
             href="https://t.me/bergty"
             target="_blank"
@@ -422,7 +422,7 @@ const HomePage: React.FC = () => {
             <span className="hidden sm:inline">Telegram</span>
           </a>
 
-          {/* WhatsApp */}
+          
           <a
             href="https://wa.me/87716252863"
             target="_blank"
