@@ -3,7 +3,9 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Mail, Lock, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import API_URL from "../config"; 
 
 const RegisterForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +22,10 @@ const RegisterForm: React.FC = () => {
     confirmPassword: "",
   });
 
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -28,7 +34,7 @@ const RegisterForm: React.FC = () => {
     }));
     setErrors((prev) => ({
       ...prev,
-      [name]: "", 
+      [name]: "",
     }));
   };
 
@@ -40,54 +46,52 @@ const RegisterForm: React.FC = () => {
       confirmPassword: "",
     };
 
-    if (!formData.username) {
-      newErrors.username = "Username is required.";
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address.";
-    }
-
-    if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters long.";
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match.";
-    }
+    if (!formData.username) newErrors.username = "Username is required.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = "Invalid email.";
+    if (formData.password.length < 6) newErrors.password = "At least 6 characters.";
+    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords do not match.";
 
     setErrors(newErrors);
     return Object.values(newErrors).every((error) => error === "");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (validateForm()) {
-      alert("Registration Successful!");
-      console.log(formData);
+    if (!validateForm()) return;
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const response = await axios.post(`${API_URL}/auth/register`, {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      setMessage("Registration successful!");
+      setTimeout(() => navigate("/login"), 2000);
+    } catch (error: any) {
+      setMessage(error.response?.data?.detail || "Registration failed.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div
-      className="h-screen w-screen flex justify-center items-center bg-gradient-to-br from-blue-900 to-black"
-    >
-      <Card className="w-full max-w-md p-8 shadow-2xl border border-gray-700 bg-gray-800 rounded-2xl transition-transform hover:scale-105 duration-300">
+    <div className="h-screen w-screen flex justify-center items-center bg-gradient-to-br from-blue-900 to-black">
+      <Card className="w-full max-w-md p-8 shadow-2xl border border-gray-700 bg-gray-800 rounded-2xl">
         <CardHeader>
-          <CardTitle className="text-center text-3xl font-extrabold text-white mb-6 tracking-wider">
+          <CardTitle className="text-center text-3xl font-extrabold text-white mb-6">
             Register
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {message && <p className="text-center text-green-400">{message}</p>}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Username */}
             <div className="relative">
-              <label
-                htmlFor="username"
-                className="block text-sm font-medium text-gray-400 mb-1"
-              >
+              <label htmlFor="username" className="block text-sm font-medium text-gray-400">
                 <User className="absolute left-2 top-1/2 transform -translate-y-1/2 text-blue-400" />
                 <span className="ml-7">Username</span>
               </label>
@@ -97,22 +101,14 @@ const RegisterForm: React.FC = () => {
                 value={formData.username}
                 onChange={handleChange}
                 placeholder="Enter your username"
-                className={`w-full rounded-lg bg-gray-700 border ${
-                  errors.username ? "border-red-500" : "border-gray-600"
-                } text-white placeholder-gray-500 p-3 pl-10 shadow-inner focus:ring-4 focus:ring-blue-500 focus:outline-none transition-all`}
+                className={`w-full rounded-lg bg-gray-700 border ${errors.username ? "border-red-500" : "border-gray-600"} text-white p-3 pl-10`}
                 required
               />
-              {errors.username && (
-                <p className="text-red-500 text-sm mt-1">{errors.username}</p>
-              )}
+              {errors.username && <p className="text-red-500 text-sm">{errors.username}</p>}
             </div>
 
-          
             <div className="relative">
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-400 mb-1"
-              >
+              <label htmlFor="email" className="block text-sm font-medium text-gray-400">
                 <Mail className="absolute left-2 top-1/2 transform -translate-y-1/2 text-blue-400" />
                 <span className="ml-7">Email</span>
               </label>
@@ -123,22 +119,14 @@ const RegisterForm: React.FC = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Enter your email"
-                className={`w-full rounded-lg bg-gray-700 border ${
-                  errors.email ? "border-red-500" : "border-gray-600"
-                } text-white placeholder-gray-500 p-3 pl-10 shadow-inner focus:ring-4 focus:ring-blue-500 focus:outline-none transition-all`}
+                className={`w-full rounded-lg bg-gray-700 border ${errors.email ? "border-red-500" : "border-gray-600"} text-white p-3 pl-10`}
                 required
               />
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-              )}
+              {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
             </div>
 
-            
             <div className="relative">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-400 mb-1"
-              >
+              <label htmlFor="password" className="block text-sm font-medium text-gray-400">
                 <Lock className="absolute left-2 top-1/2 transform -translate-y-1/2 text-blue-400" />
                 <span className="ml-7">Password</span>
               </label>
@@ -149,22 +137,14 @@ const RegisterForm: React.FC = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Enter your password"
-                className={`w-full rounded-lg bg-gray-700 border ${
-                  errors.password ? "border-red-500" : "border-gray-600"
-                } text-white placeholder-gray-500 p-3 pl-10 shadow-inner focus:ring-4 focus:ring-blue-500 focus:outline-none transition-all`}
+                className={`w-full rounded-lg bg-gray-700 border ${errors.password ? "border-red-500" : "border-gray-600"} text-white p-3 pl-10`}
                 required
               />
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-              )}
+              {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
             </div>
 
-            
             <div className="relative">
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-400 mb-1"
-              >
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-400">
                 <Lock className="absolute left-2 top-1/2 transform -translate-y-1/2 text-blue-400" />
                 <span className="ml-7">Confirm Password</span>
               </label>
@@ -175,32 +155,20 @@ const RegisterForm: React.FC = () => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 placeholder="Confirm your password"
-                className={`w-full rounded-lg bg-gray-700 border ${
-                  errors.confirmPassword ? "border-red-500" : "border-gray-600"
-                } text-white placeholder-gray-500 p-3 pl-10 shadow-inner focus:ring-4 focus:ring-blue-500 focus:outline-none transition-all`}
+                className={`w-full rounded-lg bg-gray-700 border ${errors.confirmPassword ? "border-red-500" : "border-gray-600"} text-white p-3 pl-10`}
                 required
               />
-              {errors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.confirmPassword}
-                </p>
-              )}
+              {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
             </div>
 
-            
-            <Button
-              type="submit"
-              className="w-full py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white font-bold rounded-lg hover:from-green-500 hover:to-blue-500 hover:scale-105 focus:ring-4 focus:ring-blue-500 transition-transform"
-            >
-              Register
+            <Button type="submit" className="w-full py-3 bg-blue-600 text-white rounded-lg" disabled={loading}>
+              {loading ? "Registering..." : "Register"}
             </Button>
           </form>
+
           <p className="text-center text-sm text-gray-400 mt-4">
-          Already have an account?{" "}
-          <Link to="/login" className="text-blue-500 hover:underline">
-            Login
-          </Link>
-        </p>
+            Already have an account? <Link to="/login" className="text-blue-500">Login</Link>
+          </p>
         </CardContent>
       </Card>
     </div>

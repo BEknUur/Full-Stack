@@ -9,9 +9,7 @@ const DashboardProfile: React.FC = () => {
   const [message, setMessage] = useState("");
 
   const handleSaveProfile = () => {
-    // Здесь можно добавить вызов API для сохранения данных профиля
     console.log("Saving profile:", { name, email, phone, bio, profileImage });
-    // Эмуляция успешного сохранения
     setMessage("Profile saved successfully!");
     setTimeout(() => setMessage(""), 3000);
   };
@@ -20,11 +18,10 @@ const DashboardProfile: React.FC = () => {
     <div className="p-8 text-white">
       <h2 className="text-3xl font-bold text-green-400">My Profile</h2>
       
-      {/* Сообщение об успешном сохранении */}
       {message && <p className="mt-2 text-green-500">{message}</p>}
 
       <div className="mt-6 flex flex-col sm:flex-row space-x-4 space-y-4 sm:space-y-0">
-        {/* Блок изображения */}
+       
         <div>
           {profileImage ? (
             <img
@@ -49,7 +46,6 @@ const DashboardProfile: React.FC = () => {
                 }
               }}
             />
-            {/* Кнопка удаления изображения, если оно установлено */}
             {profileImage && (
               <button
                 onClick={() => setProfileImage(null)}
@@ -61,7 +57,6 @@ const DashboardProfile: React.FC = () => {
           </div>
         </div>
 
-        {/* Блок данных профиля */}
         <div className="flex-1">
           <div className="mb-4">
             <label className="block text-gray-400">Name</label>

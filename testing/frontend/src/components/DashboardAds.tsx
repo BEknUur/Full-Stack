@@ -11,7 +11,7 @@ interface CarAd {
 }
 
 const DashboardAds: React.FC = () => {
-  // Начальные данные с уникальными id
+  
   const [uploadedCars, setUploadedCars] = useState<CarAd[]>([
     { id: 1, name: "Toyota Camry", price: "100$/day", location: "Almaty", rating: 4.5 },
     { id: 2, name: "Hyundai Sonata", price: "80$/day", location: "Astana", rating: 4.0 },

@@ -3,16 +3,15 @@ import React from "react";
 const DashboardHome: React.FC = () => {
   return (
     <div className="text-white p-4">
-      {/* Заголовок и краткое описание */}
       <h1 className="text-4xl font-bold text-blue-500">
-        Welcome to QazaqRental Dashboard!
+        Welcome to Dashboard!
       </h1>
       <p className="mt-4 text-lg">
         Here you can manage your profile, upload new cars, chat with other users,
         and explore all functionalities of QazaqRental.
       </p>
 
-      {/* Блок статистики */}
+     
       <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-gray-800 p-4 rounded-lg shadow-md text-center">
           <h2 className="text-xl font-semibold text-green-400">Cars Uploaded</h2>

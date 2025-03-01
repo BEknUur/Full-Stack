@@ -15,7 +15,6 @@ const Sidebar: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
 
-  // Массив с элементами меню
   const navItems = [
     { name: "Home", to: "/main", icon: <HomeIcon className="w-5 h-5" /> },
     { name: "Search Cars", to: "/main/search", icon: <SearchIcon className="w-5 h-5" /> },
@@ -31,19 +30,19 @@ const Sidebar: React.FC = () => {
         collapsed ? "w-20" : "w-64"
       }`}
     >
-      {/* Заголовок и кнопка сворачивания */}
+      {/* Верхняя панель с кнопкой меню */}
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
         {!collapsed && <span className="font-bold text-xl">Dashboard</span>}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-2 rounded hover:bg-gray-700 transition-colors"
+          className="p-2 rounded-lg bg-gray-800 hover:bg-gray-600 transition-colors shadow-md"
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          <MenuIcon className="w-5 h-5" />
+          <MenuIcon className="w-6 h-6 text-white" />
         </button>
       </div>
 
-      {/* Меню */}
+      {/* Навигационное меню */}
       <nav className="flex-1 mt-2">
         {navItems.map((item, index) => (
           <NavLink
@@ -51,7 +50,9 @@ const Sidebar: React.FC = () => {
             to={item.to}
             className={({ isActive }) =>
               `flex items-center px-6 py-3 transition-colors ${
-                isActive ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700"
+                isActive
+                  ? "bg-blue-700 text-white"
+                  : "text-gray-300 hover:bg-gray-700 hover:text-white"
               }`
             }
           >
@@ -61,11 +62,11 @@ const Sidebar: React.FC = () => {
         ))}
       </nav>
 
-      {/* Нижняя часть: кнопка Logout */}
+      {/* Нижняя часть с Logout */}
       <div className="p-4 border-t border-gray-700">
         <button
           onClick={() => navigate("/login")}
-          className="flex items-center w-full p-2 text-blue-400 hover:underline transition-colors"
+          className="flex items-center w-full p-2 text-red-400 hover:text-red-300 transition-colors"
         >
           <LogOutIcon className="w-5 h-5 mr-2" />
           {!collapsed && <span>Logout</span>}

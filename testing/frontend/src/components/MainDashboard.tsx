@@ -1,7 +1,6 @@
 import React from "react";
-import { Routes, Route, } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Sidebar from "./Sidebar";
-
 
 import DashboardHome from "./DashboardHome";
 import DashboardSearch from "./DashboardSearch";
@@ -11,23 +10,35 @@ import DashboardProfile from "./DashboardProfile";
 import DashboardUpload from "./DashboardUpload";
 
 const MainDashboard: React.FC = () => {
-  
-
   return (
     <div className="flex h-screen bg-gray-900">
-      
+
+    
       <Sidebar />
 
      
-      <div className="flex-1 overflow-y-auto p-4">
-        <Routes>
-          <Route path="/" element={<DashboardHome />} />
-          <Route path="search" element={<DashboardSearch />} />
-          <Route path="profile" element={<DashboardProfile />} />
-          <Route path="upload" element={<DashboardUpload />} />
-          <Route path="chat" element={<DashboardChat />} />
-          <Route path="my-ads" element={<DashboardAds />} />
-        </Routes>
+      <div className="flex-1 flex flex-col overflow-y-auto">
+
+      
+        <header className="bg-gray-800 text-white py-4 px-6 flex justify-between items-center border-b border-gray-700">
+          <h1 className="text-xl font-bold">Welcome to QazaqRental !</h1>
+          <div className="flex items-center space-x-4">
+       
+            <span className="text-sm text-gray-400">User: Beknur</span>
+          </div>
+        </header>
+
+        
+        <main className="flex-1 p-4 bg-gray-900">
+          <Routes>
+            <Route path="/" element={<DashboardHome />} />
+            <Route path="search" element={<DashboardSearch />} />
+            <Route path="profile" element={<DashboardProfile />} />
+            <Route path="upload" element={<DashboardUpload />} />
+            <Route path="chat" element={<DashboardChat />} />
+            <Route path="my-ads" element={<DashboardAds />} />
+          </Routes>
+        </main>
       </div>
     </div>
   );

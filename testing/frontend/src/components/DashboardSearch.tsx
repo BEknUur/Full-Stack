@@ -9,7 +9,7 @@ interface Car {
 }
 
 const DashboardSearch: React.FC = () => {
-  // Поля формы
+  
   const [location, setLocation] = useState("");
   const [brand, setBrand] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
@@ -17,12 +17,10 @@ const DashboardSearch: React.FC = () => {
   const [returnDate, setReturnDate] = useState("");
   const [carType, setCarType] = useState("");
 
-  // Состояния для результатов, загрузки и ошибок
   const [cars, setCars] = useState<Car[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Фиктивные данные для примера
   const dummyCars: Car[] = [
     { id: 1, brand: "Toyota Camry", location: "Almaty", price: 100 },
     { id: 2, brand: "BMW X5", location: "Astana", price: 150 },
@@ -35,29 +33,23 @@ const DashboardSearch: React.FC = () => {
     setError("");
 
     try {
-      // Эмулируем задержку запроса к серверу
       setTimeout(() => {
         let filtered = dummyCars;
 
-        // Фильтрация по местоположению
         if (location) {
           filtered = filtered.filter((car) =>
             car.location.toLowerCase().includes(location.toLowerCase())
           );
         }
-        // Фильтрация по марке автомобиля
         if (brand) {
           filtered = filtered.filter((car) =>
             car.brand.toLowerCase().includes(brand.toLowerCase())
           );
         }
-        // Фильтрация по максимальной цене
         if (maxPrice) {
           filtered = filtered.filter((car) => car.price <= Number(maxPrice));
         }
-        // Фильтрация по типу автомобиля (если данные будут доступны)
         if (carType) {
-          // Здесь можно добавить фильтрацию по типу, если поле type присутствует
         }
 
         setCars(filtered);
@@ -76,14 +68,13 @@ const DashboardSearch: React.FC = () => {
     setPickUpDate("");
     setReturnDate("");
     setCarType("");
-    setCars([]); // Очистка результатов поиска
+    setCars([]);
   };
 
   return (
     <div className="p-8 text-white">
       <h2 className="text-3xl font-bold text-green-400">Search for Cars</h2>
       <form onSubmit={handleSearch} className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Поле: Местоположение */}
         <input
           type="text"
           placeholder="Enter location"
@@ -91,7 +82,7 @@ const DashboardSearch: React.FC = () => {
           value={location}
           onChange={(e) => setLocation(e.target.value)}
         />
-        {/* Поле: Марка автомобиля */}
+       
         <input
           type="text"
           placeholder="Car brand"
