@@ -4,9 +4,6 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import API_URL from "../config";
-import axios from "axios";
-
 
 const LoginForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -20,7 +17,6 @@ const LoginForm: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [message, setMessage] = useState("");
 
   const navigate = useNavigate();
 
@@ -55,34 +51,19 @@ const LoginForm: React.FC = () => {
     return Object.values(newErrors).every((error) => error === "");
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-  
-    if (!validateForm()) return;
-  
-    setIsLoading(true);
-    setMessage("");
-    try {
-      const response = await axios.post(`${API_URL}/auth/login`, {
-        email: formData.email,
-        password: formData.password,
-      });
-  
-      setMessage("Login successful!");
-      
-      
-      localStorage.setItem("token", response.data.access_token);
-      
-      
-      navigate("/main");
-  
-    } catch (err) {
-      setErrors({ ...errors, email: "Invalid email or password" });
-    } finally {
-      setIsLoading(false);
+
+    if (validateForm()) {
+      setIsLoading(true);
+      // Эмулируем API вызов
+      setTimeout(() => {
+        console.log("Login Successful:", formData);
+        setIsLoading(false);
+        navigate("/main");
+      }, 1500);
     }
   };
-  
 
   return (
     <div className="h-screen w-screen flex justify-center items-center bg-gradient-to-br from-blue-900 to-black">
@@ -93,7 +74,6 @@ const LoginForm: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-        {message && <p className="text-center text-green-400">{message}</p>}
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div className="relative">
@@ -184,11 +164,11 @@ const LoginForm: React.FC = () => {
             </p>
             <div className="flex justify-center space-x-4">
               <Button className="flex items-center bg-red-600 hover:bg-red-700">
-              
+                {/* Здесь можно вставить иконку Google */}
                 Google
               </Button>
               <Button className="flex items-center bg-blue-600 hover:bg-blue-700">
-               
+                {/* Здесь можно вставить иконку Facebook */}
                 Facebook
               </Button>
             </div>
