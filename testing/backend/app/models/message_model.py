@@ -8,3 +8,4 @@ class Message(Base):
     sender_email = Column(String, ForeignKey("users.email"))
     text = Column(String)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
+    image_url=Column(String,nullable=True)
