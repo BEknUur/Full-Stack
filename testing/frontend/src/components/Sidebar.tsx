@@ -30,7 +30,7 @@ const Sidebar: React.FC = () => {
         collapsed ? "w-20" : "w-64"
       }`}
     >
-      {/* Верхняя панель с кнопкой меню */}
+      
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
         {!collapsed && <span className="font-bold text-xl">Dashboard</span>}
         <button
@@ -65,7 +65,7 @@ const Sidebar: React.FC = () => {
       {/* Нижняя часть с Logout */}
       <div className="p-4 border-t border-gray-700">
         <button
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/")}
           className="flex items-center w-full p-2 text-red-400 hover:text-red-300 transition-colors"
         >
           <LogOutIcon className="w-5 h-5 mr-2" />

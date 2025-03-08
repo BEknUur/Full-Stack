@@ -36,7 +36,7 @@ const DashboardChat: React.FC = () => {
       setUserEmail(email);
       fetchMessages();
     } else {
-      alert("Вы не авторизованы.");
+      alert("You are not authorized.");
     }
   }, []);
 
@@ -47,7 +47,7 @@ const DashboardChat: React.FC = () => {
       setChatMessages(response.data);
       scrollToBottom();
     } catch (error) {
-      console.error("Ошибка загрузки сообщений", error);
+      console.error("Error loading messages.", error);
     } finally {
       setLoading(false);
     }
@@ -59,7 +59,7 @@ const DashboardChat: React.FC = () => {
     try {
       setLoading(true);
 
-      // Оптимистичное добавление "временного" сообщения в чат
+     
       const tempId = Date.now(); // временный ID
       const tempMessage: Message = {
         id: tempId,
@@ -102,7 +102,7 @@ const DashboardChat: React.FC = () => {
       setFile(null);
       scrollToBottom();
     } catch (error) {
-      console.error("Ошибка отправки сообщения", error);
+      console.error("Message sending error", error);
     } finally {
       setLoading(false);
     }
@@ -115,7 +115,7 @@ const DashboardChat: React.FC = () => {
   const getInitials = (email: string) => email.charAt(0).toUpperCase();
 
   const toggleReaction = (id: number) => {
-    // «Ставим лайк» или убираем его
+   
     setChatMessages((prevMessages) =>
       prevMessages.map((msg) =>
         msg.id === id ? { ...msg, reaction: msg.reaction ? undefined : "👍" } : msg
@@ -151,7 +151,7 @@ const DashboardChat: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white relative overflow-hidden">
-      {/* Декоративные элементы (как в DashboardUpload) */}
+     
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-blue-500/10 to-transparent"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full filter blur-3xl"></div>
@@ -159,24 +159,24 @@ const DashboardChat: React.FC = () => {
       </div>
 
       <div className="relative container mx-auto px-4 py-12">
-        {/* Шапка чата (аналогично DashboardUpload) */}
+       
         <div className="flex flex-col items-center mb-12">
           <div className="relative mb-3">
             <h1 className="text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
-              ЧАТ
+              CHAT
             </h1>
-            {/* Тот же градиентный "блик" за текстом */}
+            
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg blur opacity-20"></div>
           </div>
           <p className="text-gray-400 text-lg max-w-2xl text-center">
-            Общайтесь со своими клиентами в режиме реального времени
+          Communicate with your customers in real time
           </p>
         </div>
 
         {/* Основной блок чата со схожим дизайном (backdrop-blur, border и т.п.) */}
         <div className="max-w-4xl mx-auto">
           <div className="relative backdrop-blur-sm bg-black/40 border border-white/10 rounded-2xl p-8 shadow-2xl overflow-hidden">
-            {/* Заголовок внутри блока (опционально) */}
+            
             <div className="flex items-center mb-6">
               <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mr-3">
                 <svg
@@ -194,7 +194,7 @@ const DashboardChat: React.FC = () => {
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold text-blue-400">Диалоги</h2>
+              <h2 className="text-2xl font-bold text-blue-400">Dialogues</h2>
             </div>
 
             {/* Список сообщений */}
@@ -205,7 +205,7 @@ const DashboardChat: React.FC = () => {
                 </div>
               ) : chatMessages.length === 0 ? (
                 <div className="text-center py-8 text-gray-400">
-                  Начните общение, отправив сообщение
+                  Start communication by sending a message
                 </div>
               ) : (
                 chatMessages.map((msg) => {
@@ -220,7 +220,7 @@ const DashboardChat: React.FC = () => {
                       }`}
                     >
                       <div className="flex max-w-xs md:max-w-md group">
-                        {/* Аватарка, если чужое сообщение */}
+                        
                         {!isMine && (
                           <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center font-bold mr-2 mt-1">
                             {getInitials(msg.sender_email)}
@@ -262,7 +262,7 @@ const DashboardChat: React.FC = () => {
                               ) : (
                                 <div className="bg-gray-800 p-3 flex items-center">
                                   <File className="w-5 h-5 mr-2 text-blue-400" />
-                                  <span className="text-sm truncate">Открыть файл</span>
+                                  <span className="text-sm truncate">Open file</span>
                                 </div>
                               )}
                             </a>
@@ -282,7 +282,7 @@ const DashboardChat: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Кнопка "лайк" (реакция) */}
+                      
                         <button
                           className={`
                             ml-2 mt-1 p-1.5 rounded-full
@@ -303,9 +303,9 @@ const DashboardChat: React.FC = () => {
               <div ref={chatEndRef} />
             </div>
 
-            {/* Поле ввода (с прикреплением файла) */}
+            
             <div className="mt-4 p-3 border-t border-white/10 bg-black/20 rounded-xl">
-              {/* Прикреплённый файл, если есть */}
+             
               {file && (
                 <div className="mb-3 p-2 bg-black/30 rounded-lg flex items-center">
                   <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center mr-2">
@@ -340,7 +340,7 @@ const DashboardChat: React.FC = () => {
                 <button
                   className="p-2 rounded-full bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
                   onClick={handleFileClick}
-                  title="Прикрепить файл"
+                  title="Attach file"
                 >
                   <Paperclip className="w-5 h-5" />
                   <input
@@ -353,7 +353,7 @@ const DashboardChat: React.FC = () => {
 
                 <input
                   type="text"
-                  placeholder="Введите сообщение..."
+                  placeholder="Enter a message..."
                   className="flex-1 py-3 px-4 bg-black/30 rounded-full text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
@@ -372,7 +372,7 @@ const DashboardChat: React.FC = () => {
                     } 
                     transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500
                   `}
-                  title="Отправить сообщение"
+                  title="Send a message"
                 >
                   <Send className="w-5 h-5" />
                 </button>

@@ -16,7 +16,7 @@ const DashboardProfile: React.FC = () => {
 
   useEffect(() => {
     if (!userEmail) {
-      setMessage("Пользователь не залогинен или отсутствует email в localStorage.");
+      setMessage("The user is not logged in or there is no email in localStorage.");
     } else {
       handleLoadProfile(userEmail);
     }
@@ -25,25 +25,25 @@ const DashboardProfile: React.FC = () => {
  
   const handleLoadProfile = async (email: string) => {
     try {
-      setMessage("Загрузка профиля...");
+      setMessage("Loading profile...");
       const res = await axios.get(`${API_URL}/profile?email=${email}`);
       setProfile(res.data);
-      setMessage("Профиль загружен!");
+      setMessage("Profile uploaded!");
     } catch (error: any) {
       console.error("Failed to fetch profile:", error);
       setProfile(null);
       if (error.response?.status === 404) {
-        setMessage("Пользователь не найден (404).");
+        setMessage("User is not found(404).");
       } else {
-        setMessage("Ошибка при загрузке профиля.");
+        setMessage("Error when loading a profile.");
       }
     }
   };
 
-  // Сохранение (обновление) профиля
+
   const handleSaveProfile = async () => {
     if (!profile) {
-      setMessage("Нет данных профиля для сохранения!");
+      setMessage("No profile data to save!");
       return;
     }
     try {
@@ -52,14 +52,14 @@ const DashboardProfile: React.FC = () => {
         bio: profile.bio,
         profile_image: profile.profile_image,
       });
-      setMessage("Профиль успешно обновлен!");
+      setMessage("Profile has been successfully updated!");
     } catch (err) {
       console.error("Failed to update profile:", err);
-      setMessage("Ошибка при обновлении профиля.");
+      setMessage("Error when updating profile.");
     }
   };
 
-  // Загрузка нового изображения
+  
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0] && profile) {
       const formData = new FormData();
@@ -73,17 +73,17 @@ const DashboardProfile: React.FC = () => {
         setProfile((prev) =>
           prev ? { ...prev, profile_image: res.data.profile_image } : null
         );
-        setMessage("Фотография успешно загружена!");
+        setMessage("The photo has been successfully uploaded!");
       } catch (error) {
         console.error("Error when updating photo:", error);
-        setMessage("Не удалось загрузить фото.");
+        setMessage("Failed to upload a photo.");
       }
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white relative overflow-hidden">
-      {/* Декоративные элементы (как в DashboardUpload) */}
+
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-blue-500/10 to-transparent"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full filter blur-3xl"></div>
@@ -91,16 +91,16 @@ const DashboardProfile: React.FC = () => {
       </div>
 
       <div className="relative container mx-auto px-4 py-12">
-        {/* Шапка в стиле DashboardUpload */}
+        
         <div className="flex flex-col items-center mb-12">
           <div className="relative mb-3">
             <h1 className="text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
-              МОЙ ПРОФИЛЬ
+              MY PROFILE
             </h1>
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg blur opacity-20"></div>
           </div>
           <p className="text-gray-400 text-lg max-w-2xl text-center">
-            Управляйте своими персональными данными и фотографией
+                Manage your personal data and photo
           </p>
         </div>
 
@@ -114,16 +114,16 @@ const DashboardProfile: React.FC = () => {
 
           {!userEmail ? (
             <div className="text-center py-8 text-gray-400">
-              Пожалуйста, авторизуйтесь, чтобы посмотреть профиль.
+              Please log in to view profile.
             </div>
           ) : !profile ? (
             <div className="text-center py-8 text-gray-400 animate-pulse">
-              Загрузка профиля или пользователь не найден...
+                Loading profile or user not found...
             </div>
           ) : (
-            // Форма редактирования профиля
+            
             <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-8">
-              {/* Фото профиля */}
+            
               <div className="flex flex-col items-center md:w-1/3">
                 {profile.profile_image ? (
                   <img
@@ -133,13 +133,13 @@ const DashboardProfile: React.FC = () => {
                   />
                 ) : (
                   <div className="w-32 h-32 bg-gray-800 rounded-full flex items-center justify-center text-lg text-white shadow-md">
-                    Нет фото
+                     No data
                   </div>
                 )}
 
                 <label className="mt-3">
                   <span className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded cursor-pointer text-sm">
-                    Загрузить фото
+                    Loading photo
                   </span>
                   <input
                     type="file"
@@ -158,7 +158,7 @@ const DashboardProfile: React.FC = () => {
                     }
                     className="mt-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-white text-sm"
                   >
-                    Удалить фото
+                   Delete photo
                   </button>
                 )}
               </div>
@@ -196,7 +196,7 @@ const DashboardProfile: React.FC = () => {
                 {/* Bio */}
                 <div className="mb-4">
                   <label className="block text-sm text-gray-400 mb-1">
-                    О себе
+                   About me
                   </label>
                   <textarea
                     rows={3}
@@ -206,7 +206,7 @@ const DashboardProfile: React.FC = () => {
                   />
                 </div>
 
-                {/* Сохранить профиль */}
+                
                 <button
                   onClick={handleSaveProfile}
                   className="
@@ -218,7 +218,7 @@ const DashboardProfile: React.FC = () => {
                     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-700
                   "
                 >
-                  Сохранить
+                 Save
                 </button>
               </div>
             </div>

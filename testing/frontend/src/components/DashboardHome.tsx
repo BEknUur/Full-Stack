@@ -12,7 +12,7 @@ const DashboardHome: React.FC = () => {
   const navigate = useNavigate();
   const userName = localStorage.getItem("userName") || "User";
 
-  // Быстрые действия
+
   const quickActions = [
     {
       label: "Upload Car",
@@ -50,18 +50,18 @@ const DashboardHome: React.FC = () => {
         <div className="flex flex-col items-center mb-12">
           <div className="relative mb-3">
             <h1 className="text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
-              ДОБРО ПОЖАЛОВАТЬ, {userName}!
+              WELCOME, {userName}!
             </h1>
-            {/* Градиентная «подложка» */}
+           
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg blur opacity-20"></div>
           </div>
           <p className="text-gray-400 text-lg max-w-2xl text-center">
-            Управляйте своим профилем, загружайте автомобили, общайтесь с
-            пользователями и исследуйте все возможности.
+          Manage your profile, upload cars, chat with
+          and explore all the possibilities.
           </p>
         </div>
 
-        {/* Основной контейнер (статистика, быстрые действия, объявления) */}
+        
         <div className="relative backdrop-blur-sm bg-black/40 border border-white/10 rounded-2xl p-8 shadow-2xl overflow-hidden">
           {/* Статистика */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -86,7 +86,7 @@ const DashboardHome: React.FC = () => {
                   hover:bg-white/10 transition cursor-pointer space-y-2
                 "
               >
-                <div className="text-green-400 text-3xl">{action.icon}</div>
+                <div className="text-blue-400 text-3xl">{action.icon}</div>
                 <span className="text-white text-sm">{action.label}</span>
               </button>
             ))}
@@ -94,7 +94,7 @@ const DashboardHome: React.FC = () => {
 
           {/* Блок с объявлениями */}
           <div className="bg-black/30 border border-white/10 p-6 rounded-xl shadow-inner">
-            <h2 className="text-xl font-semibold text-green-400 mb-4">
+            <h2 className="text-xl font-semibold text-blue-400 mb-4">
               Announcements
             </h2>
             <p className="text-gray-300">
@@ -120,9 +120,9 @@ const StatCard: React.FC<{
       p-6 shadow-md hover:shadow-lg transition
     "
   >
-    <div className="text-green-400 text-4xl">{icon}</div>
+    <div className="text-blue-400 text-4xl">{icon}</div>
     <div>
-      <h2 className="text-xl font-semibold text-green-400">{title}</h2>
+      <h2 className="text-xl font-semibold text-blue-400">{title}</h2>
       <p className="text-2xl font-bold">{count}</p>
     </div>
   </div>

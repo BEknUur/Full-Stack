@@ -52,7 +52,7 @@ const DashboardAds: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white relative overflow-hidden">
-      {/* Декоративные элементы (как в DashboardUpload) */}
+      
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-blue-500/10 to-transparent"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full filter blur-3xl"></div>
@@ -60,38 +60,38 @@ const DashboardAds: React.FC = () => {
       </div>
 
       <div className="relative container mx-auto px-4 py-12">
-        {/* Шапка, как в DashboardUpload (большой градиентный заголовок) */}
+        
         <div className="flex flex-col items-center mb-12">
           <div className="relative mb-3">
             <h1 className="text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
-              МОИ АВТОМОБИЛИ
+                 MY CARS
             </h1>
             {/* Градиентная "тень" за заголовком */}
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg blur opacity-20"></div>
           </div>
           <p className="text-gray-400 text-lg max-w-2xl text-center">
-            Управляйте своими объявлениями и добавляйте новые автомобили
+          Manage your listings and add new vehicles
           </p>
         </div>
 
-        {/* Основной блок с backdrop, обводкой и скруглением */}
+       
         <div className="relative backdrop-blur-sm bg-black/40 border border-white/10 rounded-2xl p-8 shadow-2xl overflow-hidden">
-          {/* Шапка внутри блока: кнопка "Добавить авто" */}
+         
           <div className="flex items-center mb-8">
-            {/* Иконка / заголовок внутри блока, если нужен */}
+           
             <h2 className="text-2xl font-bold text-blue-400">
-              Всего объявлений: {uploadedCars.length}
+            Total Announcements: {uploadedCars.length}
             </h2>
             <button
               className="ml-auto px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-lg font-medium text-white transition-all shadow-lg shadow-purple-500/20 flex items-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-700"
               onClick={() => alert("Добавление нового автомобиля!")}
             >
               <PlusCircle className="w-5 h-5 mr-2" />
-              Добавить автомобиль
+                       Add a car
             </button>
           </div>
 
-          {/* Сетка карточек автомобилей */}
+        
           {uploadedCars.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {uploadedCars.map((car) => (
@@ -99,7 +99,7 @@ const DashboardAds: React.FC = () => {
                   key={car.id}
                   className="group relative overflow-hidden rounded-xl bg-gray-800 shadow-xl border border-gray-700 hover:border-gray-600 transition-all"
                 >
-                  {/* Блок с картинкой */}
+                 
                   <div className="relative h-48 overflow-hidden">
                     <img
                       src={car.imageUrl}
@@ -108,7 +108,7 @@ const DashboardAds: React.FC = () => {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-70"></div>
 
-                    {/* Рейтинг поверх картинки */}
+                    
                     <div className="absolute top-3 left-3 flex items-center px-2 py-1 rounded-full bg-gray-900 bg-opacity-70">
                       <Star className="w-4 h-4 text-yellow-400 mr-1" />
                       <span className="text-yellow-300 text-sm font-medium">
@@ -117,7 +117,7 @@ const DashboardAds: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Контент карточки */}
+                  
                   <div className="p-4">
                     <h3 className="text-xl font-semibold truncate">
                       {car.name}
@@ -140,7 +140,7 @@ const DashboardAds: React.FC = () => {
                     </p>
                   </div>
 
-                  {/* Кнопки действия (редактировать / удалить) */}
+                 
                   <div className="absolute top-3 right-3 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <button
                       onClick={() => handleEdit(car.id)}
@@ -159,7 +159,7 @@ const DashboardAds: React.FC = () => {
               ))}
             </div>
           ) : (
-            // Плашка, если нет объявлений
+            
             <div className="mt-10 text-center p-10 rounded-xl border border-gray-700 bg-gray-800">
               <div className="w-16 h-16 mx-auto rounded-full bg-gray-700 flex items-center justify-center mb-4">
                 <svg
@@ -178,10 +178,10 @@ const DashboardAds: React.FC = () => {
                 </svg>
               </div>
               <h3 className="text-xl font-medium text-gray-300">
-                У вас пока нет объявлений
+              You don't have any announcements yet
               </h3>
               <p className="mt-2 text-gray-400">
-                Добавьте свой первый автомобиль, нажав кнопку выше
+              Add your first car by clicking the button above
               </p>
             </div>
           )}

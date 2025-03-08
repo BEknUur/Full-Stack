@@ -43,7 +43,7 @@ const DashboardUpload: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
-  // Drag & Drop
+
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
@@ -70,7 +70,7 @@ const DashboardUpload: React.FC = () => {
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!carName || !pricePerDay || !location || !carType) {
-      setError("Пожалуйста, заполните все обязательные поля");
+      setError("Please fill in all mandatory fields!");
       return;
     }
 
@@ -78,13 +78,13 @@ const DashboardUpload: React.FC = () => {
     setIsLoading(true);
 
     if (!userEmail) {
-      setError("У вас нет прав для добавления автомобиля!");
+      setError("You do not have the rights to add a car!");
       setIsLoading(false);
       return;
     }
 
     try {
-      // Создание автомобиля
+      
       const carData = {
         name: carName,
         price_per_day: parseFloat(pricePerDay),
@@ -95,7 +95,7 @@ const DashboardUpload: React.FC = () => {
       const carResponse = await axios.post(`${API_URL}/cars?email=${userEmail}`, carData);
       const carId = carResponse.data.id; 
 
-      // Загрузка фотографии
+      
       if (carImage) {
         const formData = new FormData();
         formData.append("file", carImage);
@@ -106,11 +106,11 @@ const DashboardUpload: React.FC = () => {
         });
       }
 
-      setMessage("Автомобиль успешно добавлен в каталог");
+      setMessage("Car has been successfully added to the catalog!");
       handleClear();
     } catch (err) {
       console.error(err);
-      setError("❌ Произошла ошибка! Попробуйте снова.");
+      setError("❌ There was an error! Try again.");
     } finally {
       setIsLoading(false);
     }
@@ -141,7 +141,7 @@ const DashboardUpload: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white relative overflow-hidden">
-      {/* Декоративные элементы */}
+      
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-blue-500/10 to-transparent"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full filter blur-3xl"></div>
@@ -149,16 +149,16 @@ const DashboardUpload: React.FC = () => {
       </div>
 
       <div className="relative container mx-auto px-4 py-12">
-        {/* Шапка */}
+      
         <div className="flex flex-col items-center mb-12">
           <div className="relative mb-3">
             <h1 className="text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
-              ДОБАВИТЬ АВТОМОБИЛЬ
+                  ADD A CAR
             </h1>
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg blur opacity-20"></div>
           </div>
           <p className="text-gray-400 text-lg max-w-2xl text-center">
-            Разместите свой автомобиль в нашем каталоге и начните получать доход уже сегодня
+          List your car in our catalog and start earning income today
           </p>
         </div>
 
@@ -169,19 +169,19 @@ const DashboardUpload: React.FC = () => {
               isActive={uploadStep >= 1} 
               isComplete={uploadStep > 1} 
               number={1} 
-              title="Основная информация" 
+              title="Main information" 
             />
             <StepIndicator 
               isActive={uploadStep >= 2} 
               isComplete={uploadStep > 2} 
               number={2} 
-              title="Дополнительно" 
+              title="Additional" 
             />
             <StepIndicator 
               isActive={uploadStep >= 3} 
               isComplete={false} 
               number={3} 
-              title="Фотография" 
+              title="Photo" 
             />
           </div>
           <div className="h-1 bg-gray-800 mt-4 rounded-full">
@@ -192,7 +192,7 @@ const DashboardUpload: React.FC = () => {
           </div>
         </div>
 
-        {/* Сообщения об ошибке или успехе */}
+        
         {error && (
           <div className="max-w-4xl mx-auto mb-6">
             <div className="flex items-center gap-3 bg-gradient-to-r from-red-900/50 to-red-700/50 border border-red-500/50 backdrop-blur-sm p-4 rounded-lg animate-pulse">
@@ -218,13 +218,13 @@ const DashboardUpload: React.FC = () => {
             <div className={`transition-all duration-300 ${uploadStep === 1 ? "opacity-100 relative z-10" : "opacity-0 absolute -z-10"}`}>
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
                 <Car className="w-6 h-6 mr-2 text-blue-400" />
-                Основная информация
+                Main information
               </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex flex-col space-y-1">
                   <LuxuryInputField 
-                    label="Название автомобиля" 
+                    label="Name of vehicle" 
                     value={carName} 
                     onChange={setCarName}
                     icon={<Car className="w-5 h-5" />}
@@ -234,7 +234,7 @@ const DashboardUpload: React.FC = () => {
                 
                 <div className="flex flex-col space-y-1">
                   <LuxuryInputField 
-                    label="Цена за день (₸)" 
+                    label="Price for day (₸)" 
                     value={pricePerDay} 
                     onChange={setPricePerDay}
                     type="number"
@@ -245,7 +245,7 @@ const DashboardUpload: React.FC = () => {
                 
                 <div className="flex flex-col space-y-1 md:col-span-2">
                   <LuxuryInputField 
-                    label="Местоположение" 
+                    label="Location" 
                     value={location} 
                     onChange={setLocation}
                     icon={<MapPin className="w-5 h-5" />}
@@ -259,25 +259,25 @@ const DashboardUpload: React.FC = () => {
             <div className={`transition-all duration-300 ${uploadStep === 2 ? "opacity-100 relative z-10" : "opacity-0 absolute -z-10"}`}>
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
                 <FileText className="w-6 h-6 mr-2 text-purple-400" />
-                Дополнительная информация
+                Additional information
               </h2>
               
               <div className="space-y-6">
                 <div className="flex flex-col space-y-1">
                   <LuxurySelectField
-                    label="Тип автомобиля"
+                    label="Type of vehicle"
                     value={carType}
                     onChange={setCarType}
                     options={[
-                      { value: "Sedan", label: "Седан" },
-                      { value: "SUV", label: "Внедорожник" },
-                      { value: "Minivan", label: "Минивэн" },
-                      { value: "Convertible", label: "Кабриолет" },
-                      { value: "Coupe", label: "Купе" },
-                      { value: "Hatchback", label: "Хэтчбек" },
-                      { value: "Wagon", label: "Универсал" },
-                      { value: "Van", label: "Фургон" },
-                      { value: "Truck", label: "Пикап" },
+                      { value: "Sedan", label: "Sedan" },
+                      { value: "SUV", label: "SUV" },
+                      { value: "Minivan", label: "Minivan" },
+                      { value: "Convertible", label: "Convertible" },
+                      { value: "Coupe", label: "Coupe" },
+                      { value: "Hatchback", label: "Hatchback" },
+                      { value: "Wagon", label: "Wagon" },
+                      { value: "Van", label: "Van" },
+                      { value: "Truck", label: "Truck" },
                     ]}
                     required
                   />
@@ -285,10 +285,10 @@ const DashboardUpload: React.FC = () => {
                 
                 <div className="flex flex-col space-y-1">
                   <LuxuryTextareaField
-                    label="Описание"
+                    label="Description"
                     value={description}
                     onChange={setDescription}
-                    placeholder="Расскажите об особенностях автомобиля, его преимуществах и состоянии..."
+                    placeholder="Tell us about the car's features, benefits and condition..."
                   />
                 </div>
               </div>
@@ -298,7 +298,7 @@ const DashboardUpload: React.FC = () => {
             <div className={`transition-all duration-300 ${uploadStep === 3 ? "opacity-100 relative z-10" : "opacity-0 absolute -z-10"}`}>
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
                 <Camera className="w-6 h-6 mr-2 text-pink-400" />
-                Изображение автомобиля
+               Car image 
               </h2>
               
               <div 
@@ -337,10 +337,10 @@ const DashboardUpload: React.FC = () => {
                     <UploadCloud className="w-16 h-16 text-gray-400 mb-4" />
                     <div className="text-center">
                       <p className="text-lg font-medium text-gray-300 mb-1">
-                        Перетащите фотографию или нажмите для выбора
+                      Drag a photo or press to select
                       </p>
                       <p className="text-sm text-gray-500">
-                        PNG, JPG или WEBP (рекомендуется высокое качество)
+                      PNG, JPG or WEBP (high quality recommended)
                       </p>
                     </div>
                   </>
@@ -355,7 +355,7 @@ const DashboardUpload: React.FC = () => {
 
               <div className="mt-4 text-center">
                 <p className="text-gray-400 text-sm">
-                  Качественные фотографии увеличивают шансы на аренду на 60%
+                Quality photos increase the chances of renting by 60%
                 </p>
               </div>
             </div>
@@ -368,7 +368,7 @@ const DashboardUpload: React.FC = () => {
                   onClick={prevStep}
                   className="px-6 py-3 bg-transparent hover:bg-white/5 border border-white/20 rounded-lg font-medium transition-all flex items-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-700"
                 >
-                  Назад
+                Back
                 </button>
               ) : (
                 <div></div>
@@ -380,7 +380,7 @@ const DashboardUpload: React.FC = () => {
                   onClick={nextStep}
                   className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-lg font-medium text-white transition-all shadow-lg shadow-purple-500/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-700"
                 >
-                  Продолжить
+                  Continue
                 </button>
               ) : (
                 <button
@@ -406,10 +406,10 @@ const DashboardUpload: React.FC = () => {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         />
                       </svg>
-                      Добавляем ваш автомобиль...
+                      Adding your vehicle...
                     </>
                   ) : (
-                    "Добавить автомобиль"
+                    "Add a car"
                   )}
                 </button>
               )}
@@ -421,7 +421,7 @@ const DashboardUpload: React.FC = () => {
   );
 };
 
-// Компонент индикатора шага
+
 const StepIndicator = ({
   isActive,
   isComplete,

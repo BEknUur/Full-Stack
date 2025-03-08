@@ -20,9 +20,9 @@ const fadeUpVariants = {
 const HomePage: React.FC = () => {
   return (
     <div className="relative text-white bg-gray-900 overflow-hidden">
-      {/* Анимированные фоновые круги */}
+     
       <div className="absolute z-0">
-        {/* Массив цветных кругов с разными размерами/позициями/анимациями */}
+        
         <div className="absolute top-[10%] left-[5%] w-72 h-72 bg-pink-600 rounded-full opacity-20 blur-3xl animate-pulse" />
         <div className="absolute top-[30%] left-[80%] w-40 h-40 bg-green-500 rounded-full opacity-20 blur-3xl animate-ping" />
         <div className="absolute bottom-[20%] right-[10%] w-64 h-64 bg-blue-500 rounded-full opacity-20 blur-3xl animate-pulse" />

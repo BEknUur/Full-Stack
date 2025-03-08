@@ -33,7 +33,7 @@ const DashboardSearch: React.FC = () => {
       const response = await axios.get(`${API_URL}/cars`);
       let filtered = response.data as Car[];
 
-      // Пример простой фильтрации (можете модифицировать логику)
+      
       if (location) {
         filtered = filtered.filter((car) =>
           car.location.toLowerCase().includes(location.toLowerCase())
@@ -65,7 +65,7 @@ const DashboardSearch: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white relative overflow-hidden">
-      {/* Декоративные элементы (как в DashboardUpload) */}
+      
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-blue-500/10 to-transparent"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full filter blur-3xl"></div>
@@ -73,20 +73,20 @@ const DashboardSearch: React.FC = () => {
       </div>
 
       <div className="relative container mx-auto px-4 py-12">
-        {/* Крупный заголовок (как в DashboardUpload) */}
+        
         <div className="flex flex-col items-center mb-12">
           <div className="relative mb-3">
             <h1 className="text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
-              ПОИСК АВТО
+              AUTO SEARCH
             </h1>
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg blur opacity-20"></div>
           </div>
           <p className="text-gray-400 text-lg max-w-2xl text-center">
-            Найдите автомобиль, который вам нужен
+            Find the car you need
           </p>
         </div>
 
-        {/* Основной блок (backdrop, border, shadow) */}
+        
         <div className="relative backdrop-blur-sm bg-black/40 border border-white/10 rounded-2xl p-8 shadow-2xl overflow-hidden max-w-4xl mx-auto">
           <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -99,7 +99,7 @@ const DashboardSearch: React.FC = () => {
               />
             </div>
 
-            {/* Пример ещё одного поля (по бренду, цене и т.д.) */}
+            
             <div>
               <input
                 type="text"
@@ -110,7 +110,7 @@ const DashboardSearch: React.FC = () => {
               />
             </div>
 
-            {/* Пример поля для цены */}
+           
             <div>
               <input
                 type="number"
@@ -133,7 +133,7 @@ const DashboardSearch: React.FC = () => {
                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-700
                 "
               >
-                Поиск
+                Search
               </button>
               <button
                 type="button"
@@ -146,20 +146,20 @@ const DashboardSearch: React.FC = () => {
                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-700
                 "
               >
-                Сброс
+               Reset
               </button>
             </div>
           </form>
 
-          {/* Результаты поиска */}
+          
           <div className="mt-8">
             {isLoading && (
-              <p className="text-gray-200 animate-pulse">Загрузка...</p>
+              <p className="text-gray-200 animate-pulse">Loading...</p>
             )}
             {error && <p className="text-red-400 mb-2">{error}</p>}
 
             {!isLoading && !error && cars.length === 0 && (
-              <p className="text-gray-300">Нет результатов для отображения</p>
+              <p className="text-gray-300">No results</p>
             )}
 
             {cars.length > 0 && (
