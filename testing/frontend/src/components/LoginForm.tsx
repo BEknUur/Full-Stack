@@ -4,6 +4,8 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import API_URL from "@/config";
 
 const LoginForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -51,19 +53,28 @@ const LoginForm: React.FC = () => {
     return Object.values(newErrors).every((error) => error === "");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (validateForm()) {
-      setIsLoading(true);
-      // Эмулируем API вызов
-      setTimeout(() => {
-        console.log("Login Successful:", formData);
-        setIsLoading(false);
-        navigate("/main");
-      }, 1500);
+    if (!validateForm()) return;
+  
+    setIsLoading(true);
+    try {
+      const response = await axios.post(`${API_URL}/auth/auth/login`, {
+        email: formData.email,
+        password: formData.password,
+      });
+  
+      localStorage.setItem("userEmail", formData.email); 
+      localStorage.setItem("accessToken", response.data.access_token); 
+  
+      navigate("/main");
+    } catch (error: any) {
+      setErrors({ email: "", password: "Invalid email or password" });
+    } finally {
+      setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="h-screen w-screen flex justify-center items-center bg-gradient-to-br from-blue-900 to-black">
@@ -75,7 +86,7 @@ const LoginForm: React.FC = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email Field */}
+           
             <div className="relative">
               <label
                 htmlFor="email"
@@ -133,7 +144,7 @@ const LoginForm: React.FC = () => {
               )}
             </div>
 
-            {/* Remember Me */}
+          
             <div className="flex items-center">
               <input
                 id="remember"
@@ -157,18 +168,18 @@ const LoginForm: React.FC = () => {
             </Button>
           </form>
 
-          {/* Social Login Section */}
+          
           <div className="mt-6">
             <p className="text-center text-sm text-gray-400 mb-4">
               Or login with
             </p>
             <div className="flex justify-center space-x-4">
               <Button className="flex items-center bg-red-600 hover:bg-red-700">
-                {/* Здесь можно вставить иконку Google */}
+                
                 Google
               </Button>
               <Button className="flex items-center bg-blue-600 hover:bg-blue-700">
-                {/* Здесь можно вставить иконку Facebook */}
+               
                 Facebook
               </Button>
             </div>

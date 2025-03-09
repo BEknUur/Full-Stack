@@ -1,14 +1,27 @@
 from pydantic import BaseModel
-from datetime import datetime
 from typing import Optional
+from datetime import datetime
 
+class UserSearchResponse(BaseModel):
+    username: str
+    email: str
+    
+    class Config:
+        orm_mode = True
 
-class MessageCreate(BaseModel):
-    sender_email: str
+class MessageBase(BaseModel):
     text: str
 
-class MessageResponse(BaseModel):
+class MessageCreate(MessageBase):
     sender_email: str
+    receiver_username: str
+
+class MessageResponse(MessageBase):
+    id: int
+    sender_email: str
+    receiver_email: str
     text: str
     timestamp: datetime
-    file_url:Optional[str]=None
+    
+    class Config:
+        orm_mode = True

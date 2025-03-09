@@ -1,49 +1,123 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import API_URL from "../config";
-import {
-  Paperclip,
-  ThumbsUp,
-  Check,
-  CheckCheck,
-  Send,
-  Image,
-  File,
-} from "lucide-react";
+import { Send, Search, User, ArrowLeft } from "lucide-react";
 
 interface Message {
   id: number;
   sender_email: string;
+  receiver_email: string;
   text: string;
   timestamp: string;
-  file_url?: string;
-  reaction?: string;
-  status: "sent" | "delivered" | "seen";
+}
+
+interface ChatUser {
+  username: string;
+  email: string;
+  lastSeen?: string;
+  avatar?: string;
 }
 
 const DashboardChat: React.FC = () => {
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const [file, setFile] = useState<File | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [receiverUsername, setReceiverUsername] = useState("");
+  const [receiverEmail, setReceiverEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const [searching, setSearching] = useState(false);
+  const [userResults, setUserResults] = useState<ChatUser[]>([]);
+  const [activeChatOpen, setActiveChatOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [connected, setConnected] = useState(false);
+  
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const messageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const email = localStorage.getItem("userEmail");
     if (email) {
       setUserEmail(email);
-      fetchMessages();
     } else {
       alert("You are not authorized.");
     }
   }, []);
 
+  useEffect(() => {
+    if (!userEmail) return;
+    
+    if (socket) {
+      socket.close();
+    }
+
+    const newSocket = new WebSocket(`ws:${window.location.hostname}:8000/chat/ws/${userEmail}`);
+    
+    newSocket.onopen = () => {
+      console.log('WebSocket connected');
+      setConnected(true);
+    };
+
+    newSocket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      
+    
+      if (data.message && !data.error) {
+       
+        if (
+          (data.message.sender_email === receiverEmail && data.message.receiver_email === userEmail) ||
+          (data.message.sender_email === userEmail && data.message.receiver_email === receiverEmail)
+        ) {
+          setChatMessages(prev => [...prev, data.message]);
+          scrollToBottom();
+        }
+      }
+     
+      else if (data.status === "delivered" && data.message) {
+        
+        if (
+          (data.message.sender_email === userEmail && data.message.receiver_email === receiverEmail) ||
+          (data.message.sender_email === receiverEmail && data.message.receiver_email === userEmail)
+        ) {
+          setChatMessages(prev => [...prev, data.message]);
+          scrollToBottom();
+        }
+      } 
+      else if (data.error) {
+        console.error("WebSocket error:", data.error);
+      }
+    };
+    
+    newSocket.onclose = () => {
+      console.log('WebSocket disconnected');
+      setConnected(false);
+    };
+    
+    newSocket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      setConnected(false);
+    };
+    
+    setSocket(newSocket);
+    
+    return () => {
+      newSocket.close();
+    };
+
+  }, [userEmail]);
+
+  useEffect(() => {
+    if (receiverUsername) {
+      fetchMessages();
+    }
+  }, [receiverUsername]);
+
   const fetchMessages = async () => {
+    if (!receiverUsername || !userEmail) return;
+
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/chat/messages`);
+      const response = await axios.get(`${API_URL}/chat/messages/${userEmail}/${receiverUsername}`);
       setChatMessages(response.data);
       scrollToBottom();
     } catch (error) {
@@ -53,58 +127,63 @@ const DashboardChat: React.FC = () => {
     }
   };
 
+  const searchUsers = async () => {
+    if (!searchQuery.trim()) return;
+    
+    try {
+      setSearching(true);
+      const response = await axios.get(`${API_URL}/chat/search-users?query=${searchQuery}`);
+      setUserResults(response.data);
+    } catch (error) {
+      console.error("Error searching users", error);
+      setUserResults([]);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const handleStartChat = (username: string, email: string) => {
+    setReceiverUsername(username);
+    setReceiverEmail(email);
+    setActiveChatOpen(true);
+    setSearchQuery("");
+    setUserResults([]);
+    fetchMessages();
+
+    setTimeout(() => messageInputRef.current?.focus(), 100);
+  };
+
   const handleSend = async () => {
-    if (!newMessage.trim() && !file) return;
+    if (!newMessage.trim() || !receiverEmail || !userEmail || !socket) return;
 
     try {
-      setLoading(true);
-
-     
-      const tempId = Date.now(); // временный ID
-      const tempMessage: Message = {
-        id: tempId,
-        sender_email: userEmail || "",
+      const messageData = {
         text: newMessage.trim(),
-        timestamp: new Date().toISOString(),
-        status: "sent",
+        receiver_email: receiverEmail
       };
 
-      setChatMessages((prev) => [...prev, tempMessage]);
-
-      // Если есть файл — отправляем с файлом
-      if (file) {
-        const formData = new FormData();
-        formData.append("sender_email", userEmail || "");
-        formData.append("text", newMessage.trim());
-        formData.append("file", file);
-
-        const response = await axios.post(`${API_URL}/chat/send-with-file`, formData);
-        // Заменяем «временное» сообщение на реальное с бэкенда
-        setChatMessages((prev) =>
-          prev.map((msg) => (msg.id === tempId ? response.data : msg))
-        );
-      } else {
-        // Отправка без файла
-        const messageData = {
-          sender_email: userEmail,
-          text: newMessage.trim(),
-        };
-        const response = await axios.post(`${API_URL}/chat/send`, messageData, {
-          headers: { "Content-Type": "application/json" },
-        });
-        // Заменяем «временное» сообщение на реальное с бэкенда
-        setChatMessages((prev) =>
-          prev.map((msg) => (msg.id === tempId ? response.data : msg))
-        );
-      }
-
+      socket.send(JSON.stringify(messageData));
+      
       setNewMessage("");
-      setFile(null);
-      scrollToBottom();
     } catch (error) {
       console.error("Message sending error", error);
-    } finally {
-      setLoading(false);
+      
+      try {
+        const httpMessageData = {
+          sender_email: userEmail,
+          receiver_username: receiverUsername,
+          text: newMessage.trim(),
+        };
+
+        await axios.post(`${API_URL}/chat/send`, httpMessageData, {
+          headers: { "Content-Type": "application/json" },
+        });
+
+        setNewMessage("");
+        fetchMessages();
+      } catch (httpError) {
+        console.error("HTTP fallback failed:", httpError);
+      }
     }
   };
 
@@ -112,274 +191,184 @@ const DashboardChat: React.FC = () => {
     setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
-  const getInitials = (email: string) => email.charAt(0).toUpperCase();
-
-  const toggleReaction = (id: number) => {
-   
-    setChatMessages((prevMessages) =>
-      prevMessages.map((msg) =>
-        msg.id === id ? { ...msg, reaction: msg.reaction ? undefined : "👍" } : msg
-      )
-    );
+  const formatTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "delivered":
-        return <Check className="w-4 h-4 text-gray-400" />;
-      case "seen":
-        return <CheckCheck className="w-4 h-4 text-blue-400" />;
-      default:
-        return null;
-    }
+  const backToSearch = () => {
+    setActiveChatOpen(false);
+    setReceiverUsername("");
+    setReceiverEmail("");
+    setChatMessages([]);
   };
 
-  const handleFileClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0] || null;
-    setFile(selectedFile);
-  };
-
-  const isImageFile = (fileName?: string) => {
-    if (!fileName) return false;
-    const extension = fileName.split(".").pop()?.toLowerCase();
-    return ["jpg", "jpeg", "png", "gif", "webp"].includes(extension || "");
-  };
+  const connectionStatus = connected ? 
+    <span className="text-xs text-green-400">Connected</span> : 
+    <span className="text-xs text-red-400">Offline</span>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white relative overflow-hidden">
-     
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-blue-500/10 to-transparent"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full filter blur-3xl"></div>
-        <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-pink-500/5 rounded-full filter blur-3xl"></div>
-      </div>
-
-      <div className="relative container mx-auto px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-blue-950 via-black to-purple-950 text-white">
+      <div className="container mx-auto px-4 py-12">
+        <h1 className="text-6xl font-bold text-center mb-12 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-500 text-transparent bg-clip-text">
+          CHAT
+        </h1>
        
-        <div className="flex flex-col items-center mb-12">
-          <div className="relative mb-3">
-            <h1 className="text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
-              CHAT
-            </h1>
-            
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg blur opacity-20"></div>
-          </div>
-          <p className="text-gray-400 text-lg max-w-2xl text-center">
-          Communicate with your customers in real time
-          </p>
-        </div>
 
-        {/* Основной блок чата со схожим дизайном (backdrop-blur, border и т.п.) */}
-        <div className="max-w-4xl mx-auto">
-          <div className="relative backdrop-blur-sm bg-black/40 border border-white/10 rounded-2xl p-8 shadow-2xl overflow-hidden">
-            
-            <div className="flex items-center mb-6">
-              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mr-3">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                  />
-                </svg>
+        <div className="max-w-4xl mx-auto bg-black/40 backdrop-blur-sm rounded-xl overflow-hidden shadow-2xl border border-gray-800">
+          {!activeChatOpen ? (
+            <div className="p-8">
+              <div className="flex flex-col items-center mb-8">
+                <h2 className="text-xl font-semibold text-blue-400">Find Someone to Chat With</h2>
               </div>
-              <h2 className="text-2xl font-bold text-blue-400">Dialogues</h2>
-            </div>
+              
+              <div className="flex items-center bg-gray-900/80 rounded-lg overflow-hidden mb-6 border border-gray-700">
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  className="flex-1 p-4 bg-transparent text-white focus:outline-none"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && searchUsers()}
+                />
+                <button 
+                  onClick={searchUsers}
+                  className="p-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                >
+                  <Search className="w-5 h-5" />
+                </button>
+              </div>
 
-            {/* Список сообщений */}
-            <div className="bg-black/30 rounded-xl border border-white/10 max-h-96 overflow-y-auto p-4">
-              {loading && chatMessages.length === 0 ? (
-                <div className="flex justify-center py-8">
-                  <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              {searching ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
+                  <p className="text-gray-400">Searching for users...</p>
                 </div>
-              ) : chatMessages.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
-                  Start communication by sending a message
-                </div>
-              ) : (
-                chatMessages.map((msg) => {
-                  const isMine = msg.sender_email === userEmail;
-                  const isImage = msg.file_url && isImageFile(msg.file_url);
-
-                  return (
-                    <div
-                      key={msg.id}
-                      className={`flex items-start my-3 ${
-                        isMine ? "justify-end" : "justify-start"
-                      }`}
+              ) : userResults.length > 0 ? (
+                <div className="space-y-2">
+                  <h2 className="text-xl font-semibold mb-3 text-purple-300">Search Results</h2>
+                  {userResults.map((user, index) => (
+                    <div 
+                      key={index}
+                      onClick={() => handleStartChat(user.username, user.email)}
+                      className="flex items-center p-4 rounded-lg bg-gray-900/60 border border-gray-800 hover:bg-gray-800/60 hover:border-blue-500 transition cursor-pointer"
                     >
-                      <div className="flex max-w-xs md:max-w-md group">
-                        
-                        {!isMine && (
-                          <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center font-bold mr-2 mt-1">
-                            {getInitials(msg.sender_email)}
-                          </div>
-                        )}
-
-                        <div
-                          className={`
-                            p-3 rounded-2xl shadow-md 
-                            ${
-                              isMine
-                                ? "bg-blue-600 text-white rounded-br-none"
-                                : "bg-gray-700 text-gray-100 rounded-bl-none"
-                            }
-                          `}
-                        >
-                          <p className="whitespace-pre-wrap break-words">
-                            {msg.text}
-                          </p>
-
-                          {msg.file_url && (
-                            <a
-                              href={`${API_URL}${msg.file_url}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="block mt-2 rounded-lg overflow-hidden border border-gray-600 hover:border-blue-400 transition"
-                            >
-                              {isImage ? (
-                                <div className="relative">
-                                  <img
-                                    src={`${API_URL}${msg.file_url}`}
-                                    alt="file"
-                                    className="max-w-full max-h-48 object-cover"
-                                  />
-                                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <Image className="w-10 h-10 text-white" />
-                                  </div>
-                                </div>
-                              ) : (
-                                <div className="bg-gray-800 p-3 flex items-center">
-                                  <File className="w-5 h-5 mr-2 text-blue-400" />
-                                  <span className="text-sm truncate">Open file</span>
-                                </div>
-                              )}
-                            </a>
-                          )}
-
-                          <div className="flex justify-between items-center mt-1 text-xs opacity-80">
-                            <span>
-                              {new Date(msg.timestamp).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </span>
-                            <div className="flex items-center space-x-1">
-                              {msg.reaction && <span>{msg.reaction}</span>}
-                              {isMine && getStatusIcon(msg.status)}
-                            </div>
-                          </div>
-                        </div>
-
-                      
-                        <button
-                          className={`
-                            ml-2 mt-1 p-1.5 rounded-full
-                            bg-gray-700 text-gray-400
-                            hover:bg-gray-600 hover:text-blue-400
-                            transition-all transform opacity-0 group-hover:opacity-100 
-                            focus:outline-none focus:ring-2 focus:ring-blue-400
-                          `}
-                          onClick={() => toggleReaction(msg.id)}
-                        >
-                          <ThumbsUp className="w-4 h-4" />
-                        </button>
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center mr-3">
+                        <User className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-medium">{user.username}</h3>
+                        <p className="text-sm text-gray-400">{user.email}</p>
                       </div>
                     </div>
-                  );
-                })
-              )}
-              <div ref={chatEndRef} />
-            </div>
-
-            
-            <div className="mt-4 p-3 border-t border-white/10 bg-black/20 rounded-xl">
-             
-              {file && (
-                <div className="mb-3 p-2 bg-black/30 rounded-lg flex items-center">
-                  <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center mr-2">
-                    {isImageFile(file.name) ? (
-                      <Image className="w-5 h-5 text-white" />
-                    ) : (
-                      <File className="w-5 h-5 text-white" />
-                    )}
+                  ))}
+                </div>
+              ) : searchQuery ? (
+                <div className="text-center py-8 text-gray-400">
+                  <p>No users found. Try a different search term.</p>
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 flex items-center justify-center mx-auto mb-4">
+                    <User className="w-12 h-12 text-blue-400" />
                   </div>
-                  <span className="text-sm truncate flex-1">{file.name}</span>
-                  <button
-                    className="p-1 rounded-full hover:bg-gray-600 text-gray-400 hover:text-white transition-colors"
-                    onClick={() => setFile(null)}
+                  <p className="text-gray-400 mt-4">Enter a username in the search box above</p>
+                  <button 
+                    onClick={() => document.querySelector('input')?.focus()}
+                    className="mt-6 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full text-white font-medium hover:from-blue-700 hover:to-purple-700 transition"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 011.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                    Start Searching
                   </button>
                 </div>
               )}
-
-              <div className="flex items-center space-x-2">
-                <button
-                  className="p-2 rounded-full bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  onClick={handleFileClick}
-                  title="Attach file"
-                >
-                  <Paperclip className="w-5 h-5" />
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    className="hidden"
-                    onChange={handleFileChange}
-                  />
-                </button>
-
-                <input
-                  type="text"
-                  placeholder="Enter a message..."
-                  className="flex-1 py-3 px-4 bg-black/30 rounded-full text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-                />
-
-                <button
-                  onClick={handleSend}
-                  disabled={loading || (!newMessage.trim() && !file)}
-                  className={`
-                    p-3 rounded-full 
-                    ${
-                      !newMessage.trim() && !file
-                        ? "bg-gray-700 text-gray-500"
-                        : "bg-blue-600 text-white hover:bg-blue-500"
-                    } 
-                    transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500
-                  `}
-                  title="Send a message"
-                >
-                  <Send className="w-5 h-5" />
-                </button>
-              </div>
             </div>
-            {/* Конец «коробки» чата */}
-          </div>
+          ) : (
+            <>
+              <div className="bg-gradient-to-r from-blue-900 to-purple-900 p-4 flex items-center">
+                <button 
+                  onClick={backToSearch}
+                  className="p-2 rounded-full hover:bg-black/20 transition mr-2"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+                <div className="flex items-center flex-1">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center mr-3">
+                    <User className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">{receiverUsername}</h3>
+                    <div className="text-xs text-gray-300">{receiverEmail}</div>
+                  </div>
+                </div>
+                <div className="text-right">{connectionStatus}</div>
+              </div>
+
+              <div className="bg-black/60 p-6 h-96 overflow-y-auto">
+                {loading && chatMessages.length === 0 ? (
+                  <div className="flex justify-center items-center h-full">
+                    <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+                  </div>
+                ) : chatMessages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 flex items-center justify-center mb-3">
+                      <Send className="w-10 h-10 text-blue-400" />
+                    </div>
+                    <p className="text-lg">No messages yet</p>
+                    <p className="text-sm mt-2">Start the conversation!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {chatMessages.map((msg, index) => (
+                      <div 
+                        key={index} 
+                        className={`flex ${msg.sender_email === userEmail ? "justify-end" : "justify-start"}`}
+                      >
+                        <div 
+                          className={`max-w-xs sm:max-w-sm rounded-xl px-4 py-3 ${
+                            msg.sender_email === userEmail 
+                              ? "bg-gradient-to-r from-blue-600 to-purple-600 rounded-tr-none"
+                              : "bg-gray-800 rounded-tl-none"
+                          }`}
+                        >
+                          <p className="text-white">{msg.text}</p>
+                          <span className="text-xs opacity-70 block text-right mt-1">
+                            {formatTime(msg.timestamp)}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                    <div ref={chatEndRef} />
+                  </div>
+                )}
+              </div>
+
+              <div className="p-4 border-t border-gray-800 bg-black/40">
+                <div className="flex items-center">
+                  <input
+                    type="text"
+                    placeholder="Type a message..."
+                    className="flex-1 p-4 rounded-l-lg bg-gray-900/80 border border-gray-700 text-white focus:outline-none focus:border-blue-500 transition"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                    ref={messageInputRef}
+                    disabled={!connected}
+                  />
+                  <button
+                    onClick={handleSend}
+                    className={`p-4 rounded-r-lg ${
+                      !newMessage.trim() || !connected
+                        ? "bg-gray-700 text-gray-400 cursor-not-allowed" 
+                        : "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
+                    }`}
+                    disabled={!newMessage.trim() || !connected}
+                  >
+                    <Send className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

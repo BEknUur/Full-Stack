@@ -38,7 +38,6 @@ const DashboardHome: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white relative overflow-hidden">
-      {/* Декоративные элементы (как в DashboardUpload) */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-blue-500/10 to-transparent"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full filter blur-3xl"></div>
@@ -46,7 +45,7 @@ const DashboardHome: React.FC = () => {
       </div>
 
       <div className="relative container mx-auto px-4 py-12">
-        {/* Крупный градиентный заголовок */}
+        
         <div className="flex flex-col items-center mb-12">
           <div className="relative mb-3">
             <h1 className="text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
@@ -63,7 +62,7 @@ const DashboardHome: React.FC = () => {
 
         
         <div className="relative backdrop-blur-sm bg-black/40 border border-white/10 rounded-2xl p-8 shadow-2xl overflow-hidden">
-          {/* Статистика */}
+          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <StatCard icon={<FaCar />} title="Cars Uploaded" count={5} />
             <StatCard icon={<FaComments />} title="Active Chats" count={2} />
@@ -74,7 +73,7 @@ const DashboardHome: React.FC = () => {
             />
           </div>
 
-          {/* Быстрые действия */}
+          
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {quickActions.map((action, index) => (
               <button
@@ -92,7 +91,7 @@ const DashboardHome: React.FC = () => {
             ))}
           </div>
 
-          {/* Блок с объявлениями */}
+          
           <div className="bg-black/30 border border-white/10 p-6 rounded-xl shadow-inner">
             <h2 className="text-xl font-semibold text-blue-400 mb-4">
               Announcements

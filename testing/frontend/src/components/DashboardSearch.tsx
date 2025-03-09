@@ -5,7 +5,6 @@ import CarCard from "./CarCard";
 
 interface Car {
   id: number;
-  brand?: string;
   name?: string;
   location: string;
   price_per_day: number;
@@ -16,9 +15,8 @@ interface Car {
 
 const DashboardSearch: React.FC = () => {
   const [location, setLocation] = useState("");
-  const [brand, setBrand] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  // ...
+  const [carType, setCarType] = useState("");
   const [cars, setCars] = useState<Car[]>([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -30,21 +28,19 @@ const DashboardSearch: React.FC = () => {
     setCars([]);
 
     try {
-      const response = await axios.get(`${API_URL}/cars`);
-      let filtered = response.data as Car[];
+     
+      const params: Record<string, string> = {};
+      if (location) params.location = location;
+      if (maxPrice) params.max_price = maxPrice;
+      if (carType) params.car_type = carType;
 
-      
-      if (location) {
-        filtered = filtered.filter((car) =>
-          car.location.toLowerCase().includes(location.toLowerCase())
-        );
-      }
-      // ... и т.д.
+      const response = await axios.get(`${API_URL}/car/cars/search`, { params });
+      const searchResults = response.data as Car[];
 
-      if (filtered.length === 0) {
+      if (searchResults.length === 0) {
         setError("No results found.");
       } else {
-        setCars(filtered);
+        setCars(searchResults);
       }
     } catch (err) {
       console.error(err);
@@ -56,9 +52,8 @@ const DashboardSearch: React.FC = () => {
 
   const handleClear = () => {
     setLocation("");
-    setBrand("");
     setMaxPrice("");
-    // ...
+    setCarType("");
     setCars([]);
     setError("");
   };
@@ -92,32 +87,30 @@ const DashboardSearch: React.FC = () => {
             <div>
               <input
                 type="text"
-                placeholder="Местоположение"
+                placeholder="Location"
                 className="w-full py-3 px-4 bg-black/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-800/50 transition-all"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
               />
             </div>
-
             
             <div>
               <input
-                type="text"
-                placeholder="Бренд (необязательно)"
-                className="w-full py-3 px-4 bg-black/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-800/50 transition-all"
-                value={brand}
-                onChange={(e) => setBrand(e.target.value)}
-              />
-            </div>
-
-           
-            <div>
-              <input
                 type="number"
-                placeholder="Макс. цена за день"
+                placeholder="Cost for day"
                 className="w-full py-3 px-4 bg-black/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-800/50 transition-all"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <input
+                type="text"
+                placeholder="Type of car"
+                className="w-full py-3 px-4 bg-black/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-800/50 transition-all"
+                value={carType}
+                onChange={(e) => setCarType(e.target.value)}
               />
             </div>
 

@@ -7,7 +7,8 @@ class Settings:
     DATABASE_URL = os.getenv("DATABASE_URL")
     SECRET_KEY = os.getenv("SECRET_KEY")
     ALLOWED_ORIGINS = [
-        "http://localhost:5173",  # фронтенд в dev режиме
+        "http://localhost:5174",
+         "http://127.0.0.1:5174"
     ]
 
 settings = Settings()

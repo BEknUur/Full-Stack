@@ -57,19 +57,21 @@ const RegisterForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) return;
-
+  
     setLoading(true);
     setMessage("");
-
+  
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, {
+      const response = await axios.post(`${API_URL}/auth/auth/register`, {
         username: formData.username,
         email: formData.email,
         password: formData.password,
       });
-
+  
+      localStorage.setItem("userEmail", formData.email); 
+      localStorage.setItem("accessToken", response.data.access_token); 
+  
       setMessage("Registration successful!");
       setTimeout(() => navigate("/login"), 2000);
     } catch (error: any) {
@@ -78,7 +80,7 @@ const RegisterForm: React.FC = () => {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="h-screen w-screen flex justify-center items-center bg-gradient-to-br from-blue-900 to-black">
       <Card className="w-full max-w-md p-8 shadow-2xl border border-gray-700 bg-gray-800 rounded-2xl">

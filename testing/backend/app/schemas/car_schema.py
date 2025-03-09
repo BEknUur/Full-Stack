@@ -3,7 +3,6 @@ from datetime import datetime
 from typing import Optional
 
 class CarCreate(BaseModel):
-    brand: Optional[str] = None
     name: Optional[str] = None
     price_per_day: float
     location: str
@@ -13,7 +12,6 @@ class CarCreate(BaseModel):
 class CarResponse(BaseModel):
     id: int
     owner_email: str
-    brand: Optional[str]
     name: Optional[str]
     price_per_day: float
     location: str

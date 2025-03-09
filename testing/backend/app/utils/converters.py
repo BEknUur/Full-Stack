@@ -5,7 +5,6 @@ def car_to_response(car: Car) -> CarResponse:
     return CarResponse(
         id=car.id,
         owner_email=car.owner_email,
-        brand=car.brand,
         name=car.name,
         price_per_day=car.price_per_day,
         location=car.location,

@@ -42,7 +42,7 @@ const Sidebar: React.FC = () => {
         </button>
       </div>
 
-      {/* Навигационное меню */}
+      
       <nav className="flex-1 mt-2">
         {navItems.map((item, index) => (
           <NavLink
@@ -62,7 +62,7 @@ const Sidebar: React.FC = () => {
         ))}
       </nav>
 
-      {/* Нижняя часть с Logout */}
+      
       <div className="p-4 border-t border-gray-700">
         <button
           onClick={() => navigate("/")}

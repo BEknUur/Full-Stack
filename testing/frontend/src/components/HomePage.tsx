@@ -29,7 +29,7 @@ const HomePage: React.FC = () => {
         <div className="absolute bottom-[5%] left-[30%] w-80 h-80 bg-purple-500 rounded-full opacity-20 blur-3xl animate-ping" />
       </div>
 
-      {/* Навигация */}
+      
       <nav className="relative z-10 bg-gray-900 bg-opacity-80">
         <div className="container mx-auto flex items-center justify-between py-4 px-6">
           <Link
@@ -55,7 +55,7 @@ const HomePage: React.FC = () => {
         </div>
       </nav>
 
-      {/* Хедер/Hero c видеофоном */}
+      
       <header className="relative h-[80vh] flex items-center justify-center overflow-hidden">
         <video
           src="/videos/video.mp4"
@@ -112,7 +112,7 @@ const HomePage: React.FC = () => {
         </div>
       </header>
 
-      {/* Почему выбирают нас */}
+     
       <section className="py-16 bg-gray-900 relative z-10">
         <div className="container mx-auto text-center px-6">
           <motion.h2
@@ -174,7 +174,7 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Популярные авто */}
+      
       <section className="py-16 bg-gray-800 relative z-10">
         <div className="container mx-auto px-6 text-center">
           <motion.h2
@@ -238,7 +238,7 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Категории авто */}
+     
       <section className="py-16 bg-gray-900 text-center relative z-10">
         <h2 className="text-3xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-400 inline-block">
           Car Categories
@@ -282,7 +282,7 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Спец. предложения */}
+      
       <section className="py-16 bg-gray-800 text-center relative z-10">
         <h2 className="text-3xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 inline-block">
           Special Offers
@@ -321,7 +321,7 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Как это работает */}
+     
       <section className="py-16 bg-gray-900 text-center relative z-10">
         <h2 className="text-3xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-400 inline-block">
           How It Works
@@ -369,7 +369,7 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Партнёры */}
+      
       <section className="py-16 bg-gray-800 text-center relative z-10">
         <h2 className="text-3xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 inline-block">
           Trusted by Our Partners
@@ -388,7 +388,7 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Отзывы клиентов */}
+      
       <section className="py-16 bg-gray-900 text-center relative z-10">
         <motion.h2
           className="text-3xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-400 inline-block"
@@ -442,12 +442,11 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* FAQ */}
       <div className="relative z-10">
         <FAQSection />
       </div>
 
-      {/* Футер */}
+     
       <footer className="bg-gray-900 py-8 relative z-10">
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between">
           <span className="text-gray-400 text-sm">

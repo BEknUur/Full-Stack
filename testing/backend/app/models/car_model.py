@@ -6,7 +6,6 @@ class Car(Base):
     __tablename__ = "cars"
     id = Column(Integer, primary_key=True, index=True)
     owner_email = Column(String, ForeignKey("users.email"))
-    brand = Column(String, nullable=True)
     name = Column(String, nullable=True)
     price_per_day = Column(Float, nullable=False)
     location = Column(String, nullable=False)

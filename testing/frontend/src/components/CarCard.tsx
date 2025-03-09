@@ -1,9 +1,8 @@
 import React from "react";
 
-// Интерфейс данных
+
 interface Car {
   id: number;
-  brand?: string;
   name?: string;
   location: string;
   price_per_day: number;
@@ -12,12 +11,10 @@ interface Car {
   image_url?: string;
 }
 
-// Получаем базовый URL из конфига (или можешь просто прописать строкой)
-const BASE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";  // <-- Так лучше
+const BASE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 const CarCard: React.FC<{ car: Car }> = ({ car }) => {
-  
-  // Добавляем логику для абсолютного URL
+ 
   const imageUrl = car.image_url?.startsWith("/")
     ? `${BASE_API_URL}${car.image_url}`
     : car.image_url;
@@ -27,7 +24,7 @@ const CarCard: React.FC<{ car: Car }> = ({ car }) => {
       {imageUrl ? (
         <img
           src={imageUrl}
-          alt={car.brand || "Car"}
+          alt={car.name || "Car"}
           className="w-full h-48 object-cover rounded"
         />
       ) : (
@@ -38,7 +35,7 @@ const CarCard: React.FC<{ car: Car }> = ({ car }) => {
 
       <div className="mt-4">
         <h3 className="text-xl font-bold text-white">
-          {car.brand || "Unknown brand"} {car.name || ""}
+          {car.name || "Unknown vehicle"}
         </h3>
         <p className="text-gray-400 mt-1">
           Location: {car.location}

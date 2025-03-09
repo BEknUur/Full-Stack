@@ -1,78 +1,148 @@
-from fastapi import APIRouter, HTTPException, Depends, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
+import shutil
 import os
+import time
+from fastapi.staticfiles import StaticFiles
+
 from app.core.database import get_db
 from app.models.user_model import User
 from app.schemas.user_schema import UpdateProfileRequest
+from app.utils.security import decode_access_token
+from fastapi.security import OAuth2PasswordBearer
 
 router = APIRouter()
 
-@router.get("/profile")
-def get_profile(email: str, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == email).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+
+UPLOAD_DIR = "uploaded_images"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# This line should be added in your main.py file to serve static files
+# app.mount("/uploaded_images", StaticFiles(directory="uploaded_images"), name="uploaded_images")
+
+
+@router.get("/profile")
+def get_profile(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    """
+    Получить данные профиля текущего пользователя.
+    """
+
+    payload = decode_access_token(token)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token."
+        )
+
+    user_email = payload.get("sub")
+    if not user_email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token does not contain user email."
+        )
+
+    user = db.query(User).filter(User.email == user_email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+  
     return {
         "username": user.username,
         "email": user.email,
-        "role": user.role,
         "bio": user.bio,
-        "profile_image": user.profile_image
+        "profile_image": user.profile_image,
     }
 
 
 @router.put("/profile")
-def update_profile(email: str, update_data: UpdateProfileRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == email).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+def update_profile(
+    profile_data: UpdateProfileRequest,
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    """
+    Обновить данные профиля: username, bio, profile_image (если нужно).
+    """
+    # Декодируем токен
+    payload = decode_access_token(token)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token."
+        )
 
-    user.username = update_data.username
-    user.bio = update_data.bio
-    if update_data.profile_image:
-        user.profile_image = update_data.profile_image
+    user_email = payload.get("sub")
+    if not user_email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token does not contain user email."
+        )
+
+    user = db.query(User).filter(User.email == user_email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    
+    if profile_data.username is not None:
+        user.username = profile_data.username
+    if profile_data.bio is not None:
+        user.bio = profile_data.bio
+    if profile_data.profile_image is not None:
+        user.profile_image = profile_data.profile_image
 
     db.commit()
     db.refresh(user)
-    return {"message": "Profile updated successfully"}
 
+    return {
+        "username": user.username,
+        "email": user.email,
+        "bio": user.bio,
+        "profile_image": user.profile_image,
+    }
 
 @router.post("/profile/upload-image")
-def upload_profile_image(email: str, file: UploadFile = File(...), db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == email).first()
+def upload_profile_image(
+    file: UploadFile = File(...),
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    payload = decode_access_token(token)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token."
+        )
+
+    user_email = payload.get("sub")
+    if not user_email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token does not contain user email."
+        )
+
+    user = db.query(User).filter(User.email == user_email).first()
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="User not found.")
 
-    if user.profile_image:
-        old_image_path = user.profile_image.lstrip("/")
-        if os.path.exists(old_image_path):
-            os.remove(old_image_path)
+    # Генерируем уникальное имя файла, например, с текущей датой
+    filename = f"{int(time.time())}_{file.filename}"
+    file_path = os.path.join(UPLOAD_DIR, filename)
 
-    os.makedirs("uploads", exist_ok=True)
-    new_file_name = f"{user.email}_{file.filename}"
-    file_location = os.path.join("uploads", new_file_name)
-    with open(file_location, "wb") as buffer:
-        buffer.write(file.file.read())
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
 
-    user.profile_image = f"/uploads/{new_file_name}"
+    # Сохраняем путь к файлу в БД (без leading slash)
+    user.profile_image = f"uploaded_images/{filename}"
     db.commit()
+    db.refresh(user)
 
-    return {"message": "Image uploaded successfully", "profile_image": user.profile_image}
-
-
-@router.delete("/profile/remove-image")
-def remove_profile_image(email: str, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == email).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    if user.profile_image:
-        old_image_path = user.profile_image.lstrip("/")
-        if os.path.exists(old_image_path):
-            os.remove(old_image_path)
-
-        user.profile_image = None
-        db.commit()
-
-    return {"message": "Profile image removed"}
+    return {
+        "message": "File uploaded successfully",
+        "profile_image": user.profile_image,
+    }

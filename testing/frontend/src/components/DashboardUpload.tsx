@@ -37,12 +37,25 @@ const DashboardUpload: React.FC = () => {
   }, [message]);
 
   const handleFile = (file: File) => {
+   
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      setError("Please upload a valid image file (PNG, JPG, or WEBP)");
+      return;
+    }
+    
+    
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image size should be less than 5MB");
+      return;
+    }
+    
     setCarImage(file);
     const reader = new FileReader();
     reader.onload = () => setPreviewImage(reader.result as string);
     reader.readAsDataURL(file);
+    setError(""); 
   };
-
 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -74,6 +87,11 @@ const DashboardUpload: React.FC = () => {
       return;
     }
 
+    if (uploadStep === 3 && !carImage) {
+      setError("Please upload a car image!");
+      return;
+    }
+
     setError("");
     setIsLoading(true);
 
@@ -84,33 +102,36 @@ const DashboardUpload: React.FC = () => {
     }
 
     try {
+     
+      const formData = new FormData();
       
-      const carData = {
-        name: carName,
-        price_per_day: parseFloat(pricePerDay),
-        location,
-        car_type: carType,
-        description: description || "",
-      };
-      const carResponse = await axios.post(`${API_URL}/cars?email=${userEmail}`, carData);
-      const carId = carResponse.data.id; 
-
+     
       
+     
+      formData.append("name", carName);
+      formData.append("price_per_day", pricePerDay);
+      formData.append("location", location);
+      formData.append("car_type", carType);
+      formData.append("description", description || "");
+      
+   
       if (carImage) {
-        const formData = new FormData();
         formData.append("file", carImage);
-        await axios.post(`${API_URL}/cars/${carId}/upload-image`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
       }
+      
+     
+      await axios.post(`${API_URL}/car/cars?email=${userEmail}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       setMessage("Car has been successfully added to the catalog!");
       handleClear();
+      setUploadStep(1); 
     } catch (err) {
-      console.error(err);
-      setError("❌ There was an error! Try again.");
+      console.error("Upload error:", err);
+      setError("❌ There was an error uploading your car! Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -128,6 +149,20 @@ const DashboardUpload: React.FC = () => {
   };
 
   const nextStep = () => {
+   
+    if (uploadStep === 1) {
+      if (!carName || !pricePerDay || !location) {
+        setError("Please fill in all mandatory fields before continuing!");
+        return;
+      }
+    } else if (uploadStep === 2) {
+      if (!carType) {
+        setError("Please select a car type before continuing!");
+        return;
+      }
+    }
+    
+    setError(""); 
     if (uploadStep < 3) {
       setUploadStep(uploadStep + 1);
     }
@@ -162,7 +197,7 @@ const DashboardUpload: React.FC = () => {
           </p>
         </div>
 
-        {/* Индикатор прогресса */}
+       
         <div className="max-w-4xl mx-auto mb-8">
           <div className="flex justify-between">
             <StepIndicator 
@@ -211,10 +246,10 @@ const DashboardUpload: React.FC = () => {
           </div>
         )}
 
-        {/* Форма */}
+      
         <form onSubmit={handleUpload} className="max-w-4xl mx-auto">
           <div className="relative backdrop-blur-sm bg-black/40 border border-white/10 rounded-2xl p-8 shadow-2xl overflow-hidden">
-            {/* Шаг 1: Основная информация */}
+
             <div className={`transition-all duration-300 ${uploadStep === 1 ? "opacity-100 relative z-10" : "opacity-0 absolute -z-10"}`}>
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
                 <Car className="w-6 h-6 mr-2 text-blue-400" />
@@ -255,7 +290,7 @@ const DashboardUpload: React.FC = () => {
               </div>
             </div>
 
-            {/* Шаг 2: Дополнительная информация */}
+           
             <div className={`transition-all duration-300 ${uploadStep === 2 ? "opacity-100 relative z-10" : "opacity-0 absolute -z-10"}`}>
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
                 <FileText className="w-6 h-6 mr-2 text-purple-400" />
@@ -294,20 +329,21 @@ const DashboardUpload: React.FC = () => {
               </div>
             </div>
 
-            {/* Шаг 3: Изображение */}
+           
             <div className={`transition-all duration-300 ${uploadStep === 3 ? "opacity-100 relative z-10" : "opacity-0 absolute -z-10"}`}>
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
                 <Camera className="w-6 h-6 mr-2 text-pink-400" />
-               Car image 
+                Car image 
               </h2>
               
               <div 
                 className={`relative flex flex-col items-center justify-center p-12 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200
                   ${isDragging 
                     ? "border-purple-400 bg-purple-900/20" 
-                    : "border-gray-600 hover:border-blue-500 hover:bg-blue-900/10"
+                    : previewImage 
+                      ? "border-green-500 border-opacity-50" 
+                      : "border-gray-600 hover:border-blue-500 hover:bg-blue-900/10"
                   }
-                  ${previewImage ? "border-opacity-0" : "border-opacity-100"}
                 `}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
@@ -349,7 +385,7 @@ const DashboardUpload: React.FC = () => {
                   type="file"
                   className="absolute inset-0 opacity-0 cursor-pointer"
                   onChange={handleImageChange}
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp"
                 />
               </div>
 
@@ -360,7 +396,7 @@ const DashboardUpload: React.FC = () => {
               </div>
             </div>
 
-            {/* Кнопки навигации */}
+            
             <div className="flex justify-between mt-8 pt-6 border-t border-white/10">
               {uploadStep > 1 ? (
                 <button
@@ -457,7 +493,7 @@ const StepIndicator = ({
   );
 };
 
-// Продвинутые поля формы
+
 const LuxuryInputField = ({
   label,
   value,
