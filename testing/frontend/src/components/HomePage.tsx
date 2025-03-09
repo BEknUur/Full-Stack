@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -41,6 +40,25 @@ const HomePage = () => {
           </Link>
           <div className="hidden md:flex items-center space-x-6">
             <Link
+              to="/cars"
+              className="hover:text-blue-400 transition-colors duration-200"
+            >
+              Cars
+            </Link>
+         
+            <Link
+              to="/about"
+              className="hover:text-blue-400 transition-colors duration-200"
+            >
+              About
+            </Link>
+            <Link
+              to="/locations"
+              className="hover:text-blue-400 transition-colors duration-200"
+            >
+              Locations
+            </Link>
+            <Link
               to="/login"
               className="hover:text-black hover:bg-blue-400 border border-blue-500 text-blue-500 py-2 px-5 rounded transition-colors duration-300"
             >
@@ -55,6 +73,9 @@ const HomePage = () => {
           </div>
         </div>
       </nav>
+
+
+      
 
      
       <header className="relative h-[90vh] flex items-center justify-center overflow-hidden">
@@ -381,12 +402,7 @@ const HomePage = () => {
                 <div className="p-6 text-left">
                   <h3 className="text-xl font-bold text-white mb-2">{offer.title}</h3>
                   <p className="text-gray-400 mb-4">{offer.desc}</p>
-                  <Link
-                    to={`/offers/${offer.title.toLowerCase().replace(/\s+/g, '-')}`}
-                    className="inline-block bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded transition-colors duration-300 text-sm font-medium"
-                  >
-                    View Details
-                  </Link>
+                 
                 </div>
               </div>
             ))}
@@ -451,7 +467,7 @@ const HomePage = () => {
         </div>
         <div className="mt-12">
           <Link
-            to="/cars"
+            to="/register"
             className="inline-block bg-blue-600 hover:bg-blue-500 text-white py-3 px-8 rounded-md font-medium shadow-lg shadow-blue-900/30 transition-all transform hover:scale-105"
           >
             Book Now
