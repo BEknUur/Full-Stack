@@ -115,9 +115,9 @@ ORDER BY total_sales DESC;
 SELECT
     TO_CHAR(s.sale_date, 'YYYY-MM') AS sale_month,
     COUNT(s.id) AS total_sales,
-    SUM(s.amount) AS total_revenue
+    SUM(s.amount) AS total_revenu
 FROM sales s
 WHERE s.sale_date >= CURRENT_DATE - INTERVAL '1 year'
 GROUP BY sale_month
-ORDER BY total_revenue DESC
+ORDER BY total_revenu DESC
 LIMIT 1;
