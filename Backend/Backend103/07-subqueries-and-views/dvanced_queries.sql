@@ -122,10 +122,10 @@ SELECT
     e.id AS employee_id,
     e.first_name || ' ' || e.last_name AS manager_name,
     e.position,
-    COUNT(s.id) AS total_sales,
+    COUNT(s.id) AS tota_sales,
     COALESCE(SUM(s.amount), 0) AS total_revenue,
     ROUND(AVG(s.amount), 2) AS avg_sale_price
 FROM employees e
 LEFT JOIN sales s ON e.id = s.employee_id
 GROUP BY e.id
-ORDER BY total_sales DESC;
+ORDER BY tota_sales DESC;
