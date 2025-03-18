@@ -60,10 +60,8 @@ const DashboardChat: React.FC = () => {
 
     newSocket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      
-    
       if (data.message && !data.error) {
-       
+        
         if (
           (data.message.sender_email === receiverEmail && data.message.receiver_email === userEmail) ||
           (data.message.sender_email === userEmail && data.message.receiver_email === receiverEmail)
@@ -72,7 +70,7 @@ const DashboardChat: React.FC = () => {
           scrollToBottom();
         }
       }
-     
+      
       else if (data.status === "delivered" && data.message) {
         
         if (
@@ -87,7 +85,6 @@ const DashboardChat: React.FC = () => {
         console.error("WebSocket error:", data.error);
       }
     };
-    
     newSocket.onclose = () => {
       console.log('WebSocket disconnected');
       setConnected(false);

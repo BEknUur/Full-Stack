@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import API_URL from "../config";
 import CarCard from "./CarCard";
 
@@ -13,54 +14,164 @@ interface Car {
   image_url?: string;
 }
 
+// Filter options interfaces
+interface FilterOptions {
+  location: string;
+  minPrice: string;
+  maxPrice: string;
+  carType: string;
+}
+
 const DashboardSearch: React.FC = () => {
-  const [location, setLocation] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-  const [carType, setCarType] = useState("");
   const [cars, setCars] = useState<Car[]>([]);
+  const [filteredCars, setFilteredCars] = useState<Car[]>([]);
+  const [favorites, setFavorites] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-    setCars([]);
+  // Search filters
+  const [filters, setFilters] = useState<FilterOptions>({
+    location: "",
+    minPrice: "",
+    maxPrice: "",
+    carType: "",
+  });
 
-    try {
-     
-      const params: Record<string, string> = {};
-      if (location) params.location = location;
-      if (maxPrice) params.max_price = maxPrice;
-      if (carType) params.car_type = carType;
+  // Get unique locations and car types for filter options
+  const [locations, setLocations] = useState<string[]>([]);
+  const [carTypes, setCarTypes] = useState<string[]>([]);
 
-      const response = await axios.get(`${API_URL}/car/cars/search`, { params });
-      const searchResults = response.data as Car[];
+  const userEmail = localStorage.getItem("userEmail");
 
-      if (searchResults.length === 0) {
-        setError("No results found.");
-      } else {
-        setCars(searchResults);
+  useEffect(() => {
+    const fetchCarsAndFavorites = async () => {
+      if (!userEmail) {
+        setError("User not authorized");
+        setIsLoading(false);
+        return;
       }
-    } catch (err) {
-      console.error(err);
-      setError("Failed to fetch cars.");
-    } finally {
-      setIsLoading(false);
+
+      try {
+        setIsLoading(true);
+        
+        const carsResponse = await axios.get<Car[]>(`${API_URL}/car/cars/`);
+        setCars(carsResponse.data);
+        setFilteredCars(carsResponse.data);
+
+        // Extract unique locations and car types for filters
+        const uniqueLocations = [...new Set<string>(carsResponse.data.map((car: Car) => car.location))];
+        const uniqueCarTypes = [...new Set(carsResponse.data.map((car: Car) => car.car_type))];
+        setLocations(uniqueLocations);
+        setCarTypes(uniqueCarTypes);
+
+        // Fetch favorites
+        const favoritesResponse = await axios.get(`${API_URL}/favorites/`, {
+          params: { userEmail },
+        });
+        
+        // Extract car IDs from favorites
+        const favoriteIds = favoritesResponse.data.map((fav: any) => fav.car_id);
+        setFavorites(favoriteIds);
+      } catch (err) {
+        console.error("Error loading data:", err);
+        setError("Failed to load data.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCarsAndFavorites();
+  }, [userEmail]);
+
+  // Apply filters when they change
+  useEffect(() => {
+    filterCars();
+  }, [filters, cars]);
+
+  const filterCars = () => {
+    let result = [...cars];
+
+    // Filter by location
+    if (filters.location) {
+      result = result.filter(car => car.location === filters.location);
     }
+
+    // Filter by car type
+    if (filters.carType) {
+      result = result.filter(car => car.car_type === filters.carType);
+    }
+
+    // Filter by min price
+    if (filters.minPrice) {
+      const minPrice = parseFloat(filters.minPrice);
+      if (!isNaN(minPrice)) {
+        result = result.filter(car => car.price_per_day >= minPrice);
+      }
+    }
+
+    // Filter by max price
+    if (filters.maxPrice) {
+      const maxPrice = parseFloat(filters.maxPrice);
+      if (!isNaN(maxPrice)) {
+        result = result.filter(car => car.price_per_day <= maxPrice);
+      }
+    }
+
+    setFilteredCars(result);
   };
 
-  const handleClear = () => {
-    setLocation("");
-    setMaxPrice("");
-    setCarType("");
-    setCars([]);
-    setError("");
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      location: "",
+      minPrice: "",
+      maxPrice: "",
+      carType: "",
+    });
+  };
+
+  const handleBookCar = (car: Car) => {
+    navigate(`/booking/${car.id}`);
+  };
+
+  const handleLikeCar = async (car: Car) => {
+    if (!userEmail) return;
+    
+    try {
+      // If already liked, unlike it
+      if (favorites.includes(car.id)) {
+        await axios.delete(`${API_URL}/favorites/`, {
+          params: {
+            userEmail,
+            car_id: car.id,
+          },
+        });
+        setFavorites(favorites.filter(id => id !== car.id));
+      } 
+      // Otherwise, like it
+      else {
+        await axios.post(
+          `${API_URL}/favorites/`,
+          { car_id: car.id },
+          { params: { userEmail } }
+        );
+        setFavorites([...favorites, car.id]);
+      }
+    } catch (err) {
+      console.error("Error adding/removing favourite:", err);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white relative overflow-hidden">
-      
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-blue-500/10 to-transparent"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full filter blur-3xl"></div>
@@ -68,7 +179,6 @@ const DashboardSearch: React.FC = () => {
       </div>
 
       <div className="relative container mx-auto px-4 py-12">
-        
         <div className="flex flex-col items-center mb-12">
           <div className="relative mb-3">
             <h1 className="text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
@@ -77,92 +187,127 @@ const DashboardSearch: React.FC = () => {
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg blur opacity-20"></div>
           </div>
           <p className="text-gray-400 text-lg max-w-2xl text-center">
-            Find the car you need
+            Find your perfect car
           </p>
         </div>
 
-        
-        <div className="relative backdrop-blur-sm bg-black/40 border border-white/10 rounded-2xl p-8 shadow-2xl overflow-hidden max-w-4xl mx-auto">
-          <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Search Filters */}
+        <div className="relative backdrop-blur-sm bg-black/40 border border-white/10 rounded-2xl p-6 shadow-2xl mb-8">
+          <h2 className="text-xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+            Filter Options
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Location Filter */}
             <div>
-              <input
-                type="text"
-                placeholder="Location"
-                className="w-full py-3 px-4 bg-black/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-800/50 transition-all"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-              />
+              <label className="block text-sm font-medium text-gray-300 mb-1">Location</label>
+              <select
+                name="location"
+                value={filters.location}
+                onChange={handleFilterChange}
+                className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                <option value="">All Locations</option>
+                {locations.map(loc => (
+                  <option key={loc} value={loc}>{loc}</option>
+                ))}
+              </select>
             </div>
-            
+
+            {/* Min Price Filter */}
             <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Min Price ($)</label>
               <input
                 type="number"
-                placeholder="Cost for day"
-                className="w-full py-3 px-4 bg-black/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-800/50 transition-all"
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(e.target.value)}
+                name="minPrice"
+                value={filters.minPrice}
+                onChange={handleFilterChange}
+                placeholder="Min Price"
+                className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
 
+            {/* Max Price Filter */}
             <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Max Price ($)</label>
               <input
-                type="text"
-                placeholder="Type of car"
-                className="w-full py-3 px-4 bg-black/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-800/50 transition-all"
-                value={carType}
-                onChange={(e) => setCarType(e.target.value)}
+                type="number"
+                name="maxPrice"
+                value={filters.maxPrice}
+                onChange={handleFilterChange}
+                placeholder="Max Price"
+                className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
 
-            <div className="flex space-x-2">
-              <button
-                type="submit"
-                className="
-                  flex-1 py-3 
-                  bg-gradient-to-r from-blue-500 to-purple-600 
-                  hover:from-blue-600 hover:to-purple-700 
-                  rounded-lg font-medium text-white 
-                  transition-all shadow-lg shadow-purple-500/20
-                  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-700
-                "
+            {/* Car Type Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Car Type</label>
+              <select
+                name="carType"
+                value={filters.carType}
+                onChange={handleFilterChange}
+                className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
-                Search
-              </button>
-              <button
-                type="button"
-                onClick={handleClear}
-                className="
-                  flex-1 py-3 
-                  bg-transparent hover:bg-white/5 
-                  border border-white/20 rounded-lg font-medium 
-                  transition-all flex items-center
-                  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-700
-                "
+                <option value="">All Types</option>
+                {carTypes.map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Clear Filters Button */}
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={clearFilters}
+              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+
+        {/* Results Section */}
+        <div className="relative backdrop-blur-sm bg-black/40 border border-white/10 rounded-2xl p-8 shadow-2xl overflow-hidden">
+          {isLoading ? (
+            <div className="text-center py-10">
+              <div className="w-12 h-12 border-4 border-gray-600 border-t-purple-500 rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-200">Loading cars...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center p-10 border border-red-700 bg-red-900/20 rounded-xl">
+              <p className="text-red-400">{error}</p>
+            </div>
+          ) : filteredCars.length === 0 ? (
+            <div className="text-center p-10 border border-gray-700 bg-gray-800 rounded-xl">
+              <p className="text-gray-300">No cars match your search criteria.</p>
+              <button 
+                onClick={clearFilters}
+                className="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors"
               >
-               Reset
+                Clear Filters
               </button>
             </div>
-          </form>
-
-          
-          <div className="mt-8">
-            {isLoading && (
-              <p className="text-gray-200 animate-pulse">Loading...</p>
-            )}
-            {error && <p className="text-red-400 mb-2">{error}</p>}
-
-            {!isLoading && !error && cars.length === 0 && (
-              <p className="text-gray-300">No results</p>
-            )}
-
-            {cars.length > 0 && (
+          ) : (
+            <>
+              <div className="mb-4 flex justify-between items-center">
+                <h2 className="text-xl font-bold text-white">
+                  {filteredCars.length} {filteredCars.length === 1 ? 'car' : 'cars'} available
+                </h2>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {cars.map((car) => (
-                  <CarCard key={car.id} car={car} />
+                {filteredCars.map((car) => (
+                  <CarCard
+                    key={car.id}
+                    car={car}
+                    isLiked={favorites.includes(car.id)}
+                    onLike={() => handleLikeCar(car)}
+                    onBook={() => handleBookCar(car)}
+                  />
                 ))}
               </div>
-            )}
-          </div>
+            </>
+          )}
         </div>
       </div>
     </div>

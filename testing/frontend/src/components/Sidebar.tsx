@@ -8,7 +8,9 @@ import {
   MessageSquareIcon,
   LogOutIcon,
   StarIcon,
-  Menu as MenuIcon
+  Menu as MenuIcon,
+  BookIcon,
+  SaveAllIcon
 } from "lucide-react";
 
 const Sidebar: React.FC = () => {
@@ -22,6 +24,8 @@ const Sidebar: React.FC = () => {
     { name: "Upload Car", to: "/main/upload", icon: <UploadIcon className="w-5 h-5" /> },
     { name: "Chat", to: "/main/chat", icon: <MessageSquareIcon className="w-5 h-5" /> },
     { name: "My Ads", to: "/main/my-ads", icon: <StarIcon className="w-5 h-5" /> },
+    {name:"Booking",to:"/main/booking",icon:<BookIcon className="w-5 h-5"/>},
+    {name:"Favourite",to:"/main/favourite",icon:<SaveAllIcon className="w-5 h-5"/>},
   ];
 
   return (

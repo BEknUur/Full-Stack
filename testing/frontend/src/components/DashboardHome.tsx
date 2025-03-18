@@ -34,6 +34,16 @@ const DashboardHome: React.FC = () => {
       icon: <FaComments />,
       onClick: () => navigate("/main/search"),
     },
+    {
+      label: "Booking",
+      icon: <FaComments />,
+      onClick: () => navigate("/main/booking"),
+    },
+    {
+      label: "Favourite",
+      icon: <FaComments />,
+      onClick: () => navigate("/main/favourite"),
+    },
   ];
 
   return (

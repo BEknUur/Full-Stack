@@ -8,6 +8,8 @@ import DashboardAds from "./DashboardAds";
 import DashboardChat from "./DashboardChat";
 import DashboardProfile from "./DashboardProfile";
 import DashboardUpload from "./DashboardUpload";
+import DashboardBooking from "./DashboardBooking"
+import DashboardFavourites from "./DashboardFavourites";
 
 const MainDashboard: React.FC = () => {
   return (
@@ -33,6 +35,8 @@ const MainDashboard: React.FC = () => {
             <Route path="upload" element={<DashboardUpload />} />
             <Route path="chat" element={<DashboardChat />} />
             <Route path="my-ads" element={<DashboardAds />} />
+            <Route path="booking"element={<DashboardBooking/>}/>
+            <Route path="favourite" element={<DashboardFavourites/>}/>
           </Routes>
         </main>
       </div>

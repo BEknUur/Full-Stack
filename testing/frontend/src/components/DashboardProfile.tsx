@@ -86,7 +86,7 @@ const DashboardProfile: React.FC = () => {
     formData.append("file", e.target.files[0]);
 
     try {
-      // Отправляем на наш POST /profile/upload-image
+     
       const res = await axios.post(`${API_URL}/profile/profile/upload-image`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
