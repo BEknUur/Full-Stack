@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.sql import func
 from app.core.base import Base
+from sqlalchemy.orm import relationship
+
 
 class Car(Base):
     __tablename__ = "cars"
@@ -13,3 +15,5 @@ class Car(Base):
     description = Column(String, nullable=True)
     image_url = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    favorited_by = relationship("Favorite", back_populates="favorited_car", cascade="all, delete-orphan")

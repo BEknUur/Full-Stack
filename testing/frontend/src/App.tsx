@@ -8,7 +8,7 @@ import {BrowserRouter,Routes,Route} from 'react-router-dom';
 import HomePage from './components/HomePage';
 import Cars from './components/Cars';
 import MainDashboard from './components/MainDashboard';
-import Locations from './components/locations';
+import Locations from './components/Locations';
 import About from './components/about';
 
 
