@@ -11,7 +11,7 @@ from app.schemas.favorite_schema import FavoriteCreate, FavoriteOut
 
 router = APIRouter(prefix="/favorites", tags=["Favorites"])
 
-# Make sure the schema matches what we're expecting
+
 class FavoriteCreateRequest(BaseModel):
     car_id: int
 
@@ -20,21 +20,21 @@ def get_favorites(
     userEmail: str = Query(..., description="Email of the user"),
     db: Session = Depends(get_db)
 ):
-    # Find user by email
+    
     user = db.query(User).filter(User.email == userEmail).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="User not found")
 
-    # Find all favorites for this user
+   
     favorites = db.query(Favorite).filter(Favorite.user_id == user.id).all()
     
-    # Get the car details for each favorite
+   
     result = []
     for fav in favorites:
         car = db.query(Car).filter(Car.id == fav.car_id).first()
         if car:
-            # Convert car to dict and add to result
+           
             car_dict = {c.name: getattr(car, c.name) for c in car.__table__.columns}
             result.append(car_dict)
     
@@ -46,19 +46,19 @@ def add_favorite(
     userEmail: str = Query(..., description="Email of the user"),
     db: Session = Depends(get_db)
 ):
-    # Find user by email
+   
     user = db.query(User).filter(User.email == userEmail).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="User not found")
 
-    # Check if car exists
+   
     car = db.query(Car).filter(Car.id == fav_data.car_id).first()
     if not car:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Car not found")
 
-    # Check if already in favorites
+   
     existing_fav = db.query(Favorite).filter(
         Favorite.user_id == user.id,
         Favorite.car_id == fav_data.car_id
@@ -75,7 +75,7 @@ def add_favorite(
     db.commit()
     db.refresh(new_fav)
     
-    # Return the new favorite as a dict
+    
     return {
         "id": new_fav.id,
         "user_id": new_fav.user_id,
@@ -88,13 +88,13 @@ def remove_favorite(
     car_id: int = Query(..., description="ID of the car to remove"),
     db: Session = Depends(get_db)
 ):
-    # Find user by email
+    
     user = db.query(User).filter(User.email == userEmail).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="User not found")
 
-    # Find the favorite to delete
+   
     favorite = db.query(Favorite).filter(
         Favorite.user_id == user.id,
         Favorite.car_id == car_id

@@ -14,7 +14,6 @@ interface Car {
   image_url?: string;
 }
 
-// Filter options interfaces
 interface FilterOptions {
   location: string;
   minPrice: string;
@@ -30,7 +29,7 @@ const DashboardSearch: React.FC = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Search filters
+ 
   const [filters, setFilters] = useState<FilterOptions>({
     location: "",
     minPrice: "",
@@ -38,7 +37,7 @@ const DashboardSearch: React.FC = () => {
     carType: "",
   });
 
-  // Get unique locations and car types for filter options
+
   const [locations, setLocations] = useState<string[]>([]);
   const [carTypes, setCarTypes] = useState<string[]>([]);
 
@@ -59,18 +58,18 @@ const DashboardSearch: React.FC = () => {
         setCars(carsResponse.data);
         setFilteredCars(carsResponse.data);
 
-        // Extract unique locations and car types for filters
+        
         const uniqueLocations = [...new Set<string>(carsResponse.data.map((car: Car) => car.location))];
         const uniqueCarTypes = [...new Set(carsResponse.data.map((car: Car) => car.car_type))];
         setLocations(uniqueLocations);
         setCarTypes(uniqueCarTypes);
 
-        // Fetch favorites
+        
         const favoritesResponse = await axios.get(`${API_URL}/favorites/`, {
           params: { userEmail },
         });
         
-        // Extract car IDs from favorites
+        
         const favoriteIds = favoritesResponse.data.map((fav: any) => fav.car_id);
         setFavorites(favoriteIds);
       } catch (err) {
@@ -84,7 +83,7 @@ const DashboardSearch: React.FC = () => {
     fetchCarsAndFavorites();
   }, [userEmail]);
 
-  // Apply filters when they change
+  
   useEffect(() => {
     filterCars();
   }, [filters, cars]);
@@ -92,17 +91,17 @@ const DashboardSearch: React.FC = () => {
   const filterCars = () => {
     let result = [...cars];
 
-    // Filter by location
+    
     if (filters.location) {
       result = result.filter(car => car.location === filters.location);
     }
 
-    // Filter by car type
+    
     if (filters.carType) {
       result = result.filter(car => car.car_type === filters.carType);
     }
 
-    // Filter by min price
+    
     if (filters.minPrice) {
       const minPrice = parseFloat(filters.minPrice);
       if (!isNaN(minPrice)) {
@@ -110,7 +109,7 @@ const DashboardSearch: React.FC = () => {
       }
     }
 
-    // Filter by max price
+    
     if (filters.maxPrice) {
       const maxPrice = parseFloat(filters.maxPrice);
       if (!isNaN(maxPrice)) {
@@ -146,7 +145,7 @@ const DashboardSearch: React.FC = () => {
     if (!userEmail) return;
     
     try {
-      // If already liked, unlike it
+      
       if (favorites.includes(car.id)) {
         await axios.delete(`${API_URL}/favorites/`, {
           params: {
@@ -156,7 +155,7 @@ const DashboardSearch: React.FC = () => {
         });
         setFavorites(favorites.filter(id => id !== car.id));
       } 
-      // Otherwise, like it
+      
       else {
         await axios.post(
           `${API_URL}/favorites/`,
@@ -191,13 +190,13 @@ const DashboardSearch: React.FC = () => {
           </p>
         </div>
 
-        {/* Search Filters */}
+       
         <div className="relative backdrop-blur-sm bg-black/40 border border-white/10 rounded-2xl p-6 shadow-2xl mb-8">
           <h2 className="text-xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
             Filter Options
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Location Filter */}
+          
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Location</label>
               <select
@@ -213,7 +212,7 @@ const DashboardSearch: React.FC = () => {
               </select>
             </div>
 
-            {/* Min Price Filter */}
+           
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Min Price ($)</label>
               <input
@@ -226,7 +225,7 @@ const DashboardSearch: React.FC = () => {
               />
             </div>
 
-            {/* Max Price Filter */}
+            
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Max Price ($)</label>
               <input
@@ -239,7 +238,7 @@ const DashboardSearch: React.FC = () => {
               />
             </div>
 
-            {/* Car Type Filter */}
+        
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Car Type</label>
               <select
@@ -256,7 +255,7 @@ const DashboardSearch: React.FC = () => {
             </div>
           </div>
 
-          {/* Clear Filters Button */}
+          
           <div className="mt-4 flex justify-end">
             <button
               onClick={clearFilters}
@@ -267,7 +266,7 @@ const DashboardSearch: React.FC = () => {
           </div>
         </div>
 
-        {/* Results Section */}
+        
         <div className="relative backdrop-blur-sm bg-black/40 border border-white/10 rounded-2xl p-8 shadow-2xl overflow-hidden">
           {isLoading ? (
             <div className="text-center py-10">
