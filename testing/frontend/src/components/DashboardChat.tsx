@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import API_URL from "../config";
-import { Send, Search, User, ArrowLeft } from "lucide-react";
+import { Send, Search, User, ArrowLeft, PlusCircle } from "lucide-react";
 
 interface Message {
   id: number;
@@ -85,6 +85,7 @@ const DashboardChat: React.FC = () => {
         console.error("WebSocket error:", data.error);
       }
     };
+
     newSocket.onclose = () => {
       console.log('WebSocket disconnected');
       setConnected(false);
@@ -101,7 +102,7 @@ const DashboardChat: React.FC = () => {
       newSocket.close();
     };
 
-  }, [userEmail]);
+  }, [userEmail, receiverEmail]);
 
   useEffect(() => {
     if (receiverUsername) {
@@ -205,18 +206,42 @@ const DashboardChat: React.FC = () => {
     <span className="text-xs text-red-400">Offline</span>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-950 via-black to-purple-950 text-white">
-      <div className="container mx-auto px-4 py-12">
-        <h1 className="text-6xl font-bold text-center mb-12 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-500 text-transparent bg-clip-text">
-          CHAT
-        </h1>
-       
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-blue-500/10 to-transparent"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full filter blur-3xl"></div>
+        <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-pink-500/5 rounded-full filter blur-3xl"></div>
+      </div>
 
-        <div className="max-w-4xl mx-auto bg-black/40 backdrop-blur-sm rounded-xl overflow-hidden shadow-2xl border border-gray-800">
+      <div className="relative container mx-auto px-4 py-12">
+        <div className="flex flex-col items-center mb-12">
+          <div className="relative mb-3">
+            <h1 className="text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
+              CHAT
+            </h1>
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg blur opacity-20"></div>
+          </div>
+          <p className="text-gray-400 text-lg max-w-2xl text-center">
+            Connect with users and chat about vehicles
+          </p>
+        </div>
+
+        <div className="relative backdrop-blur-sm bg-black/40 border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
           {!activeChatOpen ? (
             <div className="p-8">
-              <div className="flex flex-col items-center mb-8">
-                <h2 className="text-xl font-semibold text-blue-400">Find Someone to Chat With</h2>
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-2xl font-bold text-blue-400">
+                  Find Users to Chat With
+                </h2>
+                
+                <button 
+                  onClick={() => document.querySelector('input')?.focus()}
+                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white font-medium shadow-lg shadow-purple-500/20 hover:from-blue-600 hover:to-purple-700 transition-all"
+                >
+                  <PlusCircle className="w-5 h-5 mr-2" />
+                  New Chat
+                </button>
               </div>
               
               <div className="flex items-center bg-gray-900/80 rounded-lg overflow-hidden mb-6 border border-gray-700">

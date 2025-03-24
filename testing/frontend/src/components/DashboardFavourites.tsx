@@ -48,7 +48,7 @@ const DashboardFavourites: React.FC = () => {
   }, []);
 
   const handleBookCar = (car: Car) => {
-    navigate(`/booking/${car.id}`);
+    navigate(`/main/booking`);
   };
 
   const handleUnlikeCar = async (car: Car) => {

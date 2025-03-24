@@ -412,7 +412,7 @@ const DashboardBooking: React.FC = () => {
               </label>
               <input
                 type="text"
-                placeholder="John Smith"
+                placeholder="Beknur"
                 className="w-full p-3 bg-black/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-800 transition-all"
               />
             </div>

@@ -92,75 +92,83 @@ const RegisterForm: React.FC = () => {
         <CardContent>
           {message && <p className="text-center text-green-400">{message}</p>}
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="relative">
-              <label htmlFor="username" className="block text-sm font-medium text-gray-400">
-                <User className="absolute left-2 top-1/2 transform -translate-y-1/2 text-blue-400" />
-                <span className="ml-7">Username</span>
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-400 mb-1">
+                Username
               </label>
-              <Input
-                id="username"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="Enter your username"
-                className={`w-full rounded-lg bg-gray-700 border ${errors.username ? "border-red-500" : "border-gray-600"} text-white p-3 pl-10`}
-                required
-              />
-              {errors.username && <p className="text-red-500 text-sm">{errors.username}</p>}
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400 h-5 w-5" />
+                <Input
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  placeholder="Enter your username"
+                  className={`w-full rounded-lg bg-gray-700 border ${errors.username ? "border-red-500" : "border-gray-600"} text-white p-3 pl-10`}
+                  required
+                />
+              </div>
+              {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
             </div>
 
-            <div className="relative">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-400">
-                <Mail className="absolute left-2 top-1/2 transform -translate-y-1/2 text-blue-400" />
-                <span className="ml-7">Email</span>
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-1">
+                Email
               </label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Enter your email"
-                className={`w-full rounded-lg bg-gray-700 border ${errors.email ? "border-red-500" : "border-gray-600"} text-white p-3 pl-10`}
-                required
-              />
-              {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400 h-5 w-5" />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Enter your email"
+                  className={`w-full rounded-lg bg-gray-700 border ${errors.email ? "border-red-500" : "border-gray-600"} text-white p-3 pl-10`}
+                  required
+                />
+              </div>
+              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
             </div>
 
-            <div className="relative">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-400">
-                <Lock className="absolute left-2 top-1/2 transform -translate-y-1/2 text-blue-400" />
-                <span className="ml-7">Password</span>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-400 mb-1">
+                Password
               </label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Enter your password"
-                className={`w-full rounded-lg bg-gray-700 border ${errors.password ? "border-red-500" : "border-gray-600"} text-white p-3 pl-10`}
-                required
-              />
-              {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400 h-5 w-5" />
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                  className={`w-full rounded-lg bg-gray-700 border ${errors.password ? "border-red-500" : "border-gray-600"} text-white p-3 pl-10`}
+                  required
+                />
+              </div>
+              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             </div>
 
-            <div className="relative">
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-400">
-                <Lock className="absolute left-2 top-1/2 transform -translate-y-1/2 text-blue-400" />
-                <span className="ml-7">Confirm Password</span>
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-400 mb-1">
+                Confirm Password
               </label>
-              <Input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Confirm your password"
-                className={`w-full rounded-lg bg-gray-700 border ${errors.confirmPassword ? "border-red-500" : "border-gray-600"} text-white p-3 pl-10`}
-                required
-              />
-              {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400 h-5 w-5" />
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Confirm your password"
+                  className={`w-full rounded-lg bg-gray-700 border ${errors.confirmPassword ? "border-red-500" : "border-gray-600"} text-white p-3 pl-10`}
+                  required
+                />
+              </div>
+              {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
             </div>
 
             <Button type="submit" className="w-full py-3 bg-blue-600 text-white rounded-lg" disabled={loading}>
